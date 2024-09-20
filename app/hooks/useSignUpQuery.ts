@@ -1,4 +1,4 @@
-"use client";
+="use client";
 import { useMutation } from "@tanstack/react-query";
 import { Toast } from "../components/Toast";
 import { useAppDispatch, useAppSelector } from "../redux/hook";
@@ -8,8 +8,6 @@ import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import { useEffect, useRef, useState } from "react";
 import useStateLGA from "./useStateLGA";
-// import { LoginType } from '../typings/login'
-// import { LoginSchema } from '../schema/login'
 import * as yup from "yup";
 import { useStateContext } from "../context/context";
 
@@ -29,9 +27,7 @@ export const useSignUpQuery = () => {
   const [value, setValue] = useState("");
   const [country, setCountry] = useState("Nigeria");
   const inputRefs: any = useRef([]);
-  const user = useAppSelector((state) => state?.user?.user);
   const [sex, setSex] = useState("male");
-  const [id, setId] = useState("");
   const handleModal = () => setModal((prev) => !prev);
   const paymentRef = localStorage.getItem("payRef") ?? "";
   const email = localStorage.getItem("email") ?? "";
@@ -64,7 +60,6 @@ export const useSignUpQuery = () => {
   }, [view]);
 
   const handleOtp = (e?: any) => {
-    console.log("payload", payload);
     e?.preventDefault();
     if (seconds !== 0) {
       Toast({ title: "OTP is on its way", error: false });
@@ -256,7 +251,6 @@ const signUpPayload = paymentRef ? payload:pay_load
       localStorage.setItem("auth", resp?.token);
       setLoading(false);
       setModal(true);
-      navigate.push("/dashboard");
       handleReset(signUpPayload);
       return;
     }
