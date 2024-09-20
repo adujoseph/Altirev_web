@@ -83,7 +83,7 @@ function Registration() {
               icon={<InputProfile />}
             />
             {errors.fname ? (
-              <b className="text-xs text-red-500 -mt-4">{errors.fname}</b>
+              <b className="text-xs text-red-500 -mt-4">{errors?.fname}</b>
             ) : null}
             <Input
               label="last name"
