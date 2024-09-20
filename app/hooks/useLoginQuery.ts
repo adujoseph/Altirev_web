@@ -55,10 +55,10 @@ export const useLoginQuery = () => {
     email: values.email?.trim(),
     password: values.password?.trim(),
   };
-    useEffect(() => {
-      // Prefetch the dashboard page
-      navigate.prefetch("/dashboard");
-    }, [navigate]);
+  useEffect(() => {
+    // Prefetch the dashboard page
+    navigate.prefetch("/dashboard");
+  }, [navigate]);
   const { mutate } = useMutation({
     mutationFn: () => postApi(`v1/auth/login`, payload),
     onSuccess: (data) => {
@@ -75,7 +75,12 @@ export const useLoginQuery = () => {
       if (data?.response?.status === 422) {
         setSubmitting(false);
 
-        Toast({ title: data?.response?.data?.errors?.email, error: true });
+        Toast({
+          title:
+            data?.response?.data?.errors?.email ??
+            data?.response?.data?.errors?.password,
+          error: true,
+        });
         return;
       }
       Toast({ title: data?.response?.data?.message, error: true });
