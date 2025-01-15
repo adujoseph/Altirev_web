@@ -2,12 +2,20 @@
 import React, { useState } from "react";
 import { useStateContext } from "../context/context";
 import { getPlans, getUsers } from "../server";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Plan } from "../typings";
+import { handleClickScroll } from "../components/Header";
 
 export default function usePlan() {
   const { setPlanId } = useStateContext();
-  const handlePlanId = (item: Plan) => setPlanId(item.id);
+  const handlePlanId = (item: Plan) => {
+    if (item?.title?.toLowerCase()?.includes("enterprise")) {
+      handleClickScroll("contact");
+      return;
+    } else {
+      setPlanId(item.id);
+    }
+  };
 
   const fetchPlan = async () => {
     try {
@@ -27,6 +35,8 @@ export default function usePlan() {
     refetchOnMount: true,
     refetchInterval: 120000, // 2 minutes
     refetchIntervalInBackground: true,
+    placeholderData: keepPreviousData,
+
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },

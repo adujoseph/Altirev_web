@@ -25,6 +25,33 @@ export const Close = () => (
     />
   </svg>
 );
+export const Close2 = () => (
+  <svg
+    width="40"
+    height="40"
+    viewBox="0 0 48 48"
+    fill="#fff"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect x="1.4" y="1.4" width="25.2" height="25.2" rx="12.6" fill="#fff" />
+    <rect
+      x="1.4"
+      y="1.4"
+      width="25.2"
+      height="25.2"
+      rx="12.6"
+      stroke="red"
+      strokeWidth="1.2"
+    />
+    <path
+      d="M9.19995 18.8L14 14M14 14L18.8 9.19995M14 14L9.19995 9.19995M14 14L18.8 18.8"
+      stroke="red"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 export const TimeIcon = () => (
   <svg

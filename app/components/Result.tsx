@@ -2,15 +2,17 @@
 import useResult from "../hooks/useResult";
 import ModalCard from "./modal/Modal";
 import ResultDetails from "./ResultDetails";
-import { testApi } from "../constant";
 import Card from "./Card";
 import { FilterView } from "../icons/Arrow";
 import { SearchField } from "./Search";
 import { FilterVotes } from "./FilterVotes";
 import SkeletonTable from "./skeleton/Table";
 import Paginate from "./table/table";
+import useAuth from "./Auth";
 
 function Result() {
+  const {} = useAuth(["comms", "moderator"]);
+
   const {
     inputText,
     setCategory,
@@ -24,7 +26,7 @@ function Result() {
     handleModal,
     resultSearch,
     userDetails,
-    result,
+    results,
     states,
     stateLga,
     setStateId,
@@ -38,8 +40,12 @@ function Result() {
     pollingUnitId,
     ward,
     filter,
+    editData,
+    resultByID,
+    loading,
+    setEditData,
+    resultID,
   } = useResult("");
-  console.log("filter", filter);
   return (
     <>
       {modal && (
@@ -60,13 +66,7 @@ function Result() {
           />
         </ModalCard>
       )}
-      {edit ? (
-        <ResultDetails
-          data={null}
-          userDetails={userDetails}
-          setEdit={setEdit}
-        />
-      ) : (
+
         <>
           <h1 className="text-xl text-[#272727] font-semibold">
             Election Result
@@ -80,12 +80,11 @@ function Result() {
             setCategory={setCategory}
           />
           <ResultTable
-            loading={result.isLoading}
+            loading={results.isLoading}
             result={modal ? filter?.data : resultSearch}
             category={category}
           />
         </>
-      )}
     </>
   );
 }
@@ -139,19 +138,31 @@ const ResultHeader = ({
   setInputText,
   handleModal,
 }: ResultHeaderProps) => (
-  <aside className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between">
-    <div className="flex items-center justify-center sm:justify-start w-1/2">
-      {user?.name !== "moderator" && (
-        <div
-          onClick={() => setCategory("new")}
-          className={
-            category === "new"
-              ? "font-semibold text-[#2550C0] flex items-center space-x-3 justify-center text-center text-sm border-b-2 border-[#2550C0] sm:w-[120px]"
-              : "text-[#CBCBCB] flex items-center space-x-3 justify-center cursor-pointer text-center text-sm border-b-2 border-[#CBCBCB] w-[120px]"
-          }
-        >
-          <p className="text-sm sm:text-base">New </p>
-        </div>
+  <aside className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between w-full">
+    <div className="flex items-center justify-center sm:justify-start w-full sm:w-1/2">
+      {user?.role === "comms" && (
+        <>
+          <div
+            onClick={() => setCategory("pending")}
+            className={
+              category === "pending"
+                ? "font-semibold text-[#2550C0] flex items-center space-x-3 justify-center text-center text-sm border-b-2 border-[#2550C0] sm:w-[120px]"
+                : "text-center text-[#CBCBCB] flex items-center space-x-3 justify-center cursor-pointer text-sm border-b-2 border-[#CBCBCB] w-[120px]"
+            }
+          >
+            <p className="text-base">Pending</p>
+          </div>
+          <div
+            onClick={() => setCategory("processing")}
+            className={
+              category === "processing"
+                ? "font-semibold text-[#2550C0] flex items-center space-x-3 justify-center text-center text-sm border-b-2 border-[#2550C0] sm:w-[120px]"
+                : "text-center text-[#CBCBCB] flex items-center space-x-3 justify-center cursor-pointer text-sm border-b-2 border-[#CBCBCB] w-[120px]"
+            }
+          >
+            <p className="text-base">Processing</p>
+          </div>
+        </>
       )}
       <div
         onClick={() => setCategory("approved")}
@@ -161,7 +172,7 @@ const ResultHeader = ({
             : "text-center text-[#CBCBCB] flex items-center space-x-3 justify-center cursor-pointer text-sm border-b-2 border-[#CBCBCB] w-[120px]"
         }
       >
-        <p className="text-sm sm:text-base">Approved</p>
+        <p className="text-base">Approved</p>
       </div>
       <div
         onClick={() => setCategory("rejected")}
@@ -171,14 +182,14 @@ const ResultHeader = ({
             : "text-center text-[#CBCBCB] flex items-center space-x-3 justify-center cursor-pointer text-sm border-b-2 border-[#CBCBCB] w-[120px]"
         }
       >
-        <p className="text-sm sm:text-base">Rejected</p>
+        <p className="text-base">Rejected</p>
       </div>
     </div>
-    <div className="flex items-center space-x-2 w-1/2">
+    <div className="flex items-center space-x-2 w-full sm:w-1/2">
       <p className="">
         <SearchField inputText={inputText} setInputText={setInputText} />
       </p>
-      <span
+      {/* <span
         onClick={handleModal}
         className="w-max border-[1px] border-[#CBCBCB] rounded-xl flex items-center justify-center p-2 space-x-2 text-black cursor-pointer"
       >
@@ -186,7 +197,7 @@ const ResultHeader = ({
         <p>
           <FilterView />
         </p>
-      </span>
+      </span> */}
     </div>
   </aside>
 );

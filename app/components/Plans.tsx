@@ -35,7 +35,7 @@ export default function Plans() {
                       <h1 className="text-xl font-semibold">{item?.title}</h1>
                       <p className="">{item?.subtitle}</p>
                       <Link
-                        href={item.link}
+                        href={item?.link !=='' ? item?.link :'#contact'}
                         onClick={() => handlePlanId(item)}
                         className={`rounded p-2 w-max text-sm cursor-pointer ${
                           !item?.pricing

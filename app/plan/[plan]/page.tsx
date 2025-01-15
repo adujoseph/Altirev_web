@@ -3,6 +3,7 @@ import Button from "@/app/components/Button";
 import Header from "@/app/components/Header";
 import Input from "@/app/components/Input";
 import { Toast } from "@/app/components/Toast";
+import { useStateContext } from "@/app/context/context";
 import { BackArrow } from "@/app/icons/Arrow";
 import { PremiumPlanIcon, ProPlanIcon } from "@/app/icons/ArrowUp";
 import { addThousandSeparator } from "@/app/utils";
@@ -20,6 +21,7 @@ export default function page() {
   const [agentId, setAgentId] = useState(plan === "professional" ? 1 : 101);
 
   const [isValid, setIsValid] = useState(true);
+  const { setPayRef, setEmailRef } = useStateContext();
   // const handleChange = (e: any) => {
   //   const newValue = e.target.value;
   //   if (newValue === "" || (Number(newValue) <= 100 && Number(newValue) >= 1)) {
@@ -96,6 +98,7 @@ export default function page() {
   }, [agentId]);
   // const publicKey = process.env.REACT_APP_PAYSTACK_PUBLIC_KEY;
   const publicKey = "pk_test_3d88065c4d72f0a1f435ca677609ad0da70fc33b";
+  // const publicKey = "pk_live_71ce197a14d1f8f768a455308a8a2be87f6bc434";
   // const publicKey = "pk_test_3eb5e531d4ed919aaf3d459a8490e4e9eac550cb";
   const componentProps = {
     email,
@@ -110,20 +113,24 @@ export default function page() {
       if (ref.status === "success")
         Toast({ title: ref?.message, error: false });
       navigate.push("/register");
-      localStorage.setItem("email", email);
-      localStorage.setItem("payRef", ref?.trxref);
+      setPayRef(ref?.trxref);
+      setEmailRef(email);
+
       return;
     },
   };
-    useEffect(() => {
-      // Prefetch the dashboard page
-          navigate.prefetch("/register");
-
-    }, [navigate]);
+  useEffect(() => {
+    // Prefetch the dashboard page
+    navigate.prefetch("/register");
+  }, [navigate]);
   return (
     <div className="bg-white min-h-screen">
       <Header />
-      <Link prefetch href="/" className="flex space-x-1 items-center p-5 cursor-pointer">
+      <Link
+        prefetch
+        href="/"
+        className="flex space-x-1 items-center p-5 cursor-pointer"
+      >
         <p>
           <BackArrow color="#A5A5A5" />
         </p>

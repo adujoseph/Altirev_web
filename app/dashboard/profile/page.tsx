@@ -27,16 +27,16 @@ const Profile = () => {
             <PenIcon />
           </span>
         </div>
-        <p className="border-b-2 border-[#3a4f85] flex items-center justify-center w-max">
+        {/* <p className="border-b-2 border-[#3a4f85] flex items-center justify-center w-max">
           Change Profile Image
-        </p>
+        </p> */}
       </section>
       <section
         className={`m-5 flex items-center flex-col space-y-3 sm:space-y-0 sm:flex-row justify-center sm:items-start sm:justify-around ${
           openMenu ? "flex-col space-y-3" : ""
         }`}
       >
-        <aside className="w-1/2 p-5">
+        <aside className="w-full sm:w-1/2 p-5">
           <div className="flex flex-col pointer-events-none">
             {" "}
             <p className="text-[#7E7E7E] text-sm">Name: </p>
@@ -66,20 +66,22 @@ const Profile = () => {
           </div>
           <hr className="my-5 bg-[#7E7E7E] h-[1px]" />
         </aside>
-        <aside className="w-1/2 p-5">
+        <aside className="w-full sm:w-1/2 p-5">
           <div className="flex flex-col pointer-events-none ">
             <p className="text-[#7E7E7E] text-sm">Phone Number: </p>
-            <p className="font-medium">{user?.phoneNumber}</p>
+            <p className="font-medium">
+              {user?.phoneNumber?.replace("+234", "0")}
+            </p>
           </div>
           <hr className="my-5 bg-[#7E7E7E] h-[1px]" />
           <div className="flex flex-col pointer-events-none ">
             <p className="text-[#7E7E7E] text-sm">User role: </p>
-            <p className="font-medium">{user?.role}</p>
+            <p className="font-medium capitalize">{user?.role}</p>
           </div>
           <hr className="my-5 bg-[#7E7E7E] h-[1px]" />
           <div className="flex flex-col pointer-events-none ">
             <p className="text-[#7E7E7E] text-sm">State: </p>
-            <p className="font-medium">{user?.state}</p>
+            <p className="font-medium capitalize">{user?.state?.toLowerCase()}</p>
           </div>
           <hr className="my-5 bg-[#7E7E7E] h-[1px]" />
           <div className="flex flex-col pointer-events-none ">

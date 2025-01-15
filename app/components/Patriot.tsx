@@ -1,9 +1,8 @@
+'use client'
 import React from "react";
-import { ArrowView, EyeView, FilterView } from "../icons/Arrow";
-import Link from "next/link";
-import PieChart from "./Chart";
 import { Upcoming } from "./Upcoming";
 import PastLive from "./PastLive";
+import useElection from "../hooks/useElection";
 
 interface PatriotProps {
   category: string;
@@ -18,6 +17,7 @@ export default function Patriot({
   handleModal,
   setView,
 }: PatriotProps) {
+  const { pastElection } = useElection();
   const data = [
     ["Parties", "No of Votes"],
     ["APC", 11],
@@ -43,11 +43,6 @@ export default function Patriot({
             }
           >
             <p className="text-sm sm:text-base">Past Election </p>
-            <p>
-              {category === "past" && (
-                <p className="size-2 rounded-full bg-[#101720]" />
-              )}
-            </p>
           </div>
           <div
             onClick={() => setCategory("live")}
@@ -57,13 +52,12 @@ export default function Patriot({
                 : "text-center text-[#CBCBCB] flex items-center space-x-3 justify-center cursor-pointer text-sm border-b-2 border-[#CBCBCB] w-[120px]"
             }
           >
-            <p className="text-sm sm:text-base">Live Event</p>
-
             <p>
               {category === "live" && (
-                <p className="size-2 rounded-full bg-[#101720]" />
+                <p className="size-2 rounded-full bg-[#2550C0] animate-ping" />
               )}
             </p>
+            <p className="text-sm sm:text-base">Live Event</p>
           </div>
           <div
             onClick={() => setCategory("upcoming")}
@@ -76,20 +70,30 @@ export default function Patriot({
             <p className="text-sm sm:text-base w-full flex">
               Upcoming <p className="hidden sm:flex">Event</p>{" "}
             </p>
-
-            <p>
-              {category === "upcoming" && (
-                <p className="size-2 rounded-full bg-[#101720]" />
-              )}
-            </p>
           </div>
         </div>
-        {category === "upcoming" && <Upcoming />}
+        {category === "upcoming" && (
+          <Upcoming
+            data={pastElection?.data?.upcoming}
+          />
+        )}
         {category === "past" && (
-          <PastLive bar={bar} setView={setView} handleModal={handleModal} />
+          <PastLive
+            data={pastElection?.data?.previous}
+            bar={bar}
+            loading={pastElection?.isLoading}
+            setView={setView}
+            handleModal={handleModal}
+          />
         )}
         {category === "live" && (
-          <PastLive bar={bar} setView={setView} handleModal={handleModal} />
+          <PastLive
+            data={pastElection?.data?.ongoing}
+            loading={pastElection?.isLoading}
+            bar={bar}
+            setView={setView}
+            handleModal={handleModal}
+          />
         )}
       </section>
     </>

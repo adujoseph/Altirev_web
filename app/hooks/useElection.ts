@@ -3,7 +3,7 @@ import React, { use, useState } from "react";
 import { useStateContext } from "../context/context";
 import { useAppSelector } from "../redux/hook";
 import { deleteApi, postApi } from "../services";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { User } from "../typings";
 import { getElections } from "../server";
 import { useFormik } from "formik";
@@ -17,8 +17,7 @@ export default function useElection() {
   const { edit, setEdit, setEditData } = useStateContext();
   const [modal, setModal] = useState(false);
   const user: User = useAppSelector((state) => state?.user?.user);
-  const [category, setCategory] = useState( "new"
-  );
+  const [category, setCategory] = useState("new");
   const handleModal = () => setModal((prev) => !prev);
   const defaultValue = {
     name: "",
@@ -31,30 +30,32 @@ export default function useElection() {
     status: yup.string().label("status").required(),
   });
 
-  const fetchElection = async () => {
+  const fetchPastElection = async () => {
     try {
-      const resp = await getElections(status);
+      const resp = await getElections();
       return resp;
     } catch (error) {
       console.error("Er", error);
     }
   };
 
-  const election = useQuery({
-    queryKey: ["election", status],
-    queryFn: fetchElection,
+  const pastElection = useQuery({
+    queryKey: ["election"],
+    queryFn: fetchPastElection,
     refetchOnReconnect: true,
     retry: 5,
     retryDelay: 100,
     staleTime: 5000,
     refetchOnMount: true,
     refetchInterval: 120000, // 2 minutes
+    placeholderData: keepPreviousData,
     refetchIntervalInBackground: true,
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },
     onError: (error: any) => console.error(error),
   });
+
   const {
     values,
     handleBlur,
@@ -88,27 +89,27 @@ export default function useElection() {
       if (data?.name) {
         Toast({ title: "Successful", error: false });
         setSubmitting(false);
-        election.refetch();
+        pastElection.refetch();
         handleReset(payload);
-        console.log(values?.description)
         return;
       }
       Toast({ title: data?.response?.data?.message, error: true });
       setSubmitting(false);
     },
     onError: (error) => {
-      console.log("there was an error", error);
+      console.error("there was an error", error);
     },
   });
   const deleteElection = async (id: string) => {
     setLoading(true);
     const resp = await deleteApi(`Elections/${id?.id}`);
     Toast({ title: "Deleted Successfully", error: false });
-    election.refetch();
+    pastElection.refetch();
     setLoading(false);
     setEdit(false);
     setEditData(null);
   };
+
   return {
     inputText,
     setCategory,
@@ -120,7 +121,7 @@ export default function useElection() {
     category,
     user,
     handleModal,
-    election,
+    pastElection,
     setStatus,
     deleteElection,
     status,

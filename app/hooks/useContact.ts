@@ -1,23 +1,24 @@
 "use client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { Toast } from "../components/Toast";
-import { useAppDispatch } from "../redux/hook";
-import { login } from "../redux/userSlice";
+import { useAppSelector } from "../redux/hook";
 import { postApi } from "../services";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { getContacts, getSingleUser } from "../server";
 import { useDeferredValue, useMemo, useState } from "react";
 import { useStateContext } from "../context/context";
-import { ContactType } from "../typings";
+import { ContactType, User } from "../typings";
 
 export const useContactQuery = () => {
-  const dispatch = useAppDispatch();
   const [inputText, setInputText] = useState("");
   const deferedValue = useDeferredValue(inputText);
   const [modal, setModal] = useState(false);
   const handleModal = () => setModal((prev) => !prev);
-  const { edit, setEdit } = useStateContext();
+  const { edit, setEdit, editData } = useStateContext();
+  const user: User = useAppSelector((state) => state?.user?.user);
+  const [userDetails, setUserDetails] = useState<User>();
+
   const defaultValue = {
     phone: "",
     name: "",
@@ -74,29 +75,51 @@ export const useContactQuery = () => {
       // setSubmitting(false);
     },
     onError: (error) => {
-      console.log("there was an error", error);
+      console.error("there was an error", error);
     },
   });
 
-  const fetchSingleContact = async (id:string) => {
+  const fetchSingleContact = async () => {
     try {
-    
-      const resp = await getSingleUser(id);
-      console.log('id', id)
-      console.log('resp', resp)
-      return resp;
+      const res = await getSingleUser(editData?.altirevId);
+      setUserDetails({
+        email: res?.email,
+        username: res?.username,
+        phoneNumber: res?.phoneNumber,
+        status: res?.status,
+        state: res?.location?.state?.stateName,
+        LGA: res?.location?.lga?.lgaName,
+        ward: res?.location?.ward?.wardName,
+        PU: res?.location?.pollingUnit?.pollingUnit,
+      });
     } catch (error) {
       console.error("Er", error);
     }
   };
   const fetchContact = async () => {
     try {
-      const resp = await getContacts();
+      const resp = await getContacts(user?.tenantId);
       return resp;
     } catch (error) {
       console.error("Er", error);
     }
   };
+  const single_contact = useQuery({
+    queryKey: ["single_contact", editData],
+    queryFn: fetchSingleContact,
+    refetchOnReconnect: true,
+    retry: 5,
+    retryDelay: 100,
+    staleTime: 5000,
+    refetchOnMount: true,
+    refetchInterval: 120000, // 2 minutes
+    placeholderData: keepPreviousData,
+    refetchIntervalInBackground: true,
+    onSuccess(data: any) {
+      //   Toast({ title: "page refreshed", error: false });
+    },
+    onError: (error: any) => console.error(error),
+  });
   const contact = useQuery({
     queryKey: ["contact"],
     queryFn: fetchContact,
@@ -106,30 +129,31 @@ export const useContactQuery = () => {
     staleTime: 5000,
     refetchOnMount: true,
     refetchInterval: 120000, // 2 minutes
+    placeholderData: keepPreviousData,
     refetchIntervalInBackground: true,
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },
     onError: (error: any) => console.error(error),
   });
-    const contactSearch = useMemo(
-      () =>
-        deferedValue
-          ? contact?.data?.filter(
-              (item: ContactType) =>
-                item?.name
-                  ?.toLowerCase()
-                  ?.includes(deferedValue?.toLowerCase()?.trim()) ||
-                item?.message
-                  ?.toLowerCase()
-                  ?.includes(deferedValue?.toLowerCase()?.trim()) ||
-                item?.email
-                  ?.toLowerCase()
-                  ?.includes(deferedValue?.toLowerCase()?.trim())
-            )
-          : contact?.data,
-      [deferedValue, contact?.data]
-    );
+  const contactSearch = useMemo(
+    () =>
+      deferedValue
+        ? contact?.data?.filter(
+            (item: ContactType) =>
+              item?.name
+                ?.toLowerCase()
+                ?.includes(deferedValue?.toLowerCase()?.trim()) ||
+              item?.message
+                ?.toLowerCase()
+                ?.includes(deferedValue?.toLowerCase()?.trim()) ||
+              item?.email
+                ?.toLowerCase()
+                ?.includes(deferedValue?.toLowerCase()?.trim())
+          )
+        : contact?.data,
+    [deferedValue, contact?.data]
+  );
   return {
     handleSubmit,
     values,
@@ -147,5 +171,6 @@ export const useContactQuery = () => {
     setInputText,
     contactSearch,
     fetchSingleContact,
+    userDetails,
   };
 };

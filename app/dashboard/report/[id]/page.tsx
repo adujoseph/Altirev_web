@@ -1,39 +1,90 @@
 "use client";
+import useAuth from "@/app/components/Auth";
 import { FilterVotes } from "@/app/components/FilterVotes";
 import ModalCard from "@/app/components/modal/Modal";
 import Report from "@/app/components/Report";
 import ReportDetails from "@/app/components/ReportDetails";
 import useReport from "@/app/hooks/useReport";
+import { getSingleUser } from "@/app/server";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function page() {
   const { id }: string = useParams();
+  const {} = useAuth(["comms", "moderator"]);
 
   const {
-    inputText,
-    setCategory,
+    states,
+    stateLga,
+    setStateId,
+    stateId,
+    setStateLgaId,
+    stateLgaId,
+    setWardId,
+    pollingUnit,
+    setPollingUnitId,
+    wardId,
+    pollingUnitId,
+    ward,
     setEdit,
     modal,
-    setModal,
-    setInputText,
-    edit,
-    category,
-    user,
     handleModal,
-    userDetails,
     reportByID,
+    sendReport,
+    loading,
+    setComment,
+    comment,
+    userDetails,
+    success,
+    setSuccess,
+    setUserDetails,
   } = useReport(id);
+  useEffect(() => {
+    const getUser = async () => {
+      const res = await getSingleUser(reportByID?.data?.userId);
+      setUserDetails({
+        email: res?.email,
+        username: res?.username,
+        phoneNumber: res?.phoneNumber,
+        status: res?.status,
+        state: res?.location?.state?.stateName,
+        LGA: res?.location?.lga?.lgaName,
+        ward: res?.location?.ward?.wardName,
+        PU: res?.location?.pollingUnit?.pollingUnit,
+      });
+    };
+    if (reportByID?.data?.userId) getUser();
+  }, [reportByID?.data]);
   return (
     <>
       {modal && (
         <ModalCard open={modal} setOpen={handleModal}>
-          <FilterVotes setModal={setModal} />
+          <FilterVotes
+            states={states}
+            stateLga={stateLga}
+            setStateId={setStateId}
+            stateId={stateId}
+            setStateLgaId={setStateLgaId}
+            stateLgaId={stateLgaId}
+            setWardId={setWardId}
+            pollingUnit={pollingUnit}
+            setPollingUnitId={setPollingUnitId}
+            pollingUnitId={pollingUnitId}
+            wardId={wardId}
+            ward={ward}
+          />
         </ModalCard>
       )}
       <ReportDetails
         details={reportByID?.data}
-        userDetails={userDetails}
         setEdit={setEdit}
+        comment={comment}
+        userDetails={userDetails}
+        setComment={setComment}
+        loading={loading}
+        sendReport={sendReport}
+        success={success}
+        setSuccess={setSuccess}
       />
     </>
   );

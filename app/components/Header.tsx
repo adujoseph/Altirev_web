@@ -7,6 +7,7 @@ import { logout } from "../redux/userSlice";
 import { Toast } from "./Toast";
 import { useRouter } from "next/navigation";
 import Button from "./Button";
+import { Logo } from "../icons/Logo";
 
 export default function Header() {
   const dispatch = useAppDispatch();
@@ -38,18 +39,23 @@ export default function Header() {
       <nav className="hidden lg:flex items-center justify-around h-[80px] shadow-sm bg-white">
         <div>
           <Link href="/" className="flex text-4xl font-semibold">
-            LOGO
+            <Logo />
           </Link>
         </div>
         <div className="hidden lg:flex items-center space-x-20">
           <p className="text-[#272727] font-medium cursor-pointer">Home</p>
-          <p className="text-[#272727] font-medium cursor-pointer">Services</p>
-          <Link
-            href="/#contact"
+          <p
+            onClick={() => handleClickScroll("services")}
+            className="text-[#272727] font-medium cursor-pointer"
+          >
+            Services
+          </p>
+          <p
+            onClick={() => handleClickScroll("contact")}
             className="text-[#272727] font-medium cursor-pointer"
           >
             Contact Us
-          </Link>
+          </p>
         </div>
         <div className="hidden lg:flex space-x-5 items-center">
           <Button
@@ -68,7 +74,7 @@ export default function Header() {
       <nav className="flex items-center justify-between px-5 h-[80px] shadow-sm bg-white lg:hidden">
         <div>
           <Link href="/" className="flex text-4xl font-semibold">
-            LOGO
+               <Logo />
           </Link>
         </div>
         <div className="cursor-pointer">
@@ -116,3 +122,13 @@ export default function Header() {
     </header>
   );
 }
+  export const handleClickScroll = (id: string) => {
+    const element = document.getElementById(`${id}`);
+
+    if (element) {
+      // 👇 Will scroll smoothly to the top of the next section
+      element.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  };

@@ -12,8 +12,7 @@ export const SOPModal = () => {
   const [show, setShow] = useState(true);
   const handleModal = () => setShow((prev) => !prev);
   const [comment, setComment] = useState("");
-    // const sanitizedHTML = DOMPurify.sanitize(value);
-
+  // const sanitizedHTML = DOMPurify.sanitize(value);
 
   return (
     <div className="">
@@ -41,7 +40,7 @@ export const SOPModal = () => {
                 "text-gray-500": true,
               })}
             >
-              Apr 5, 2024
+              Apr 5, {new Date().getFullYear()}
             </p>
           </div>
           <hr className=" my-2 h-0.5" />
@@ -80,7 +79,7 @@ export const SOPModal = () => {
                   placeholder="comment"
                   value={comment}
                   // onBlur={handleBlur}
-                        // dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+                  // dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
                   onChange={(e) => setComment(e.target.value)}
                   className={`p-2 rounded resize-none outline-none ${
                     comment

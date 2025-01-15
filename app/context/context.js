@@ -18,18 +18,22 @@ export const ContextProvider = ({ children }) => {
   const [open, setOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
   const [edit, setEdit] = useState(false);
+  const [electionData, setElectionData] = useState(null);
+  const [showOverview, setShowOverview] = useState(false);
   const [editData, setEditData] = useState(null);
   const [table, setTable] = useState("");
   const [title, setTitle] = useState("");
   const [planId, setPlanId] = useState("");
+  const [payRef, setPayRef] = useState("");
+  const [emailRef, setEmailRef] = useState("");
   const [requestList, setRequestList] = useState([]);
   const [requestListById, setRequestListById] = useState([]);
   useLayoutEffect(() => {
-    setTitle(user?.role === "user" ? "patriot" : user?.role);
+    setTitle(user?.role === "user" ? "Observer" : user?.role);
   }, [user?.role]);
   const handleToggle = () => setOpenMenu((prev) => !prev);
 
-  const handleClick = (name) => {
+  const handleClick = () => {
     setOpen((prev) => !prev);
   };
 
@@ -41,7 +45,11 @@ export const ContextProvider = ({ children }) => {
         handleClick,
         openMenu,
         setOpenMenu,
-        setTable,setPlanId,planId,
+        setTable,
+        setPlanId,
+        planId,
+        setPayRef,
+        payRef,
         table,
         title,
         handleToggle,
@@ -55,6 +63,12 @@ export const ContextProvider = ({ children }) => {
         requestList,
         requestListById,
         setRequestListById,
+        setEmailRef,
+        emailRef,
+        electionData,
+        setElectionData,
+        showOverview,
+        setShowOverview,
       }}
     >
       {children}

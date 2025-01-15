@@ -29,7 +29,7 @@ export const getApi = async (url: string) => {
         return err;
       });
   } catch (err: any) {
-    console.log("err", err);
+    console.error("err", err);
     return err.response;
   }
 };
@@ -50,7 +50,7 @@ export const postApi = async (url: string, payload: any) => {
     .post(process.env.NEXT_PUBLIC_API_URL + url, payload, options)
     .then((res) => res.data)
     .catch((err) => {
-      console.log("error msg: ", err);
+      console.error("error msg: ", err);
       return err;
     });
   return response;
@@ -73,11 +73,11 @@ export const patchApi = async (url: string, payload?: any) => {
       if (res.status === 200) {
         return res.data;
       } else {
-        console.log("err");
+        console.error("err");
       }
     })
     .catch((err) => {
-      console.log("error msg: ", err);
+      console.error("error msg: ", err);
       return err;
     });
   return response;
@@ -100,11 +100,11 @@ export const putApi = async (url: string, payload?: any) => {
       if (res.status === 200) {
         return res.data;
       } else {
-        console.log("err");
+        console.error("err");
       }
     })
     .catch((err) => {
-      console.log("error msg: ", err);
+      console.error("error msg: ", err);
       return err;
     });
   return response;
@@ -128,11 +128,11 @@ export const deleteApi = async (url: string) => {
       if (res.status === 200) {
         return res.data;
       } else {
-        console.log("err");
+        console.error("err");
       }
     })
     .catch((err) => {
-      console.log("error msg: ", err);
+      console.error("error msg: ", err);
       return err;
     });
   return response;

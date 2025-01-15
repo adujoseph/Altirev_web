@@ -1,20 +1,24 @@
-'use client'
+"use client";
 import { useState } from "react";
 import { TimeIcon } from "../icons/Close";
 import Card from "./Card";
 import Countdown from "./timer";
 import { ElectionCard } from "./ElectionList";
 
-export const Upcoming = () => {
+export const Upcoming = ({ data }: any) => {
+  const [details, setDetails] = useState(null);
   const [show, setShow] = useState(false);
-  const handleShow = () => setShow((prev) => !prev);
+  const handleShow = (item) => {
+    setDetails(item);
+    setShow(true);
+  };
   return (
     <div className="">
       <Card>
         {show ? (
           <Countdown
-            handleShow={handleShow}
-            targetDate={"June 1, 2025 10:00:00"}
+            handleShow={() => setShow(false)}
+            details={details}
           />
         ) : (
           <>
@@ -25,20 +29,32 @@ export const Upcoming = () => {
               Upcoming Election Schedule: Know the Dates. Stay Engaged.
             </p>
             <aside className="p-4 flex items-center justify-between flex-wrap">
-              <div className="w-full sm:w-1/2">
-                {Array(4)
-                  .fill("")
-                  .map((i) => (
-                    <ElectionCard color="#f4f4f4"  handleShow={handleShow} key={i} />
-                  ))}
-              </div>
-              <div className="w-full sm:w-1/2">
-                {Array(4)
-                  .fill("")
-                  .map((i) => (
-                    <ElectionCard color="#f4f4f4"  handleShow={handleShow} key={i} />
-                  ))}
-              </div>
+              {data?.length > 0 ? (
+                <>
+                  <div className="w-full sm:w-1/2">
+                    {data?.map((item: any) => (
+                      <ElectionCard
+                        color="#f4f4f4"
+                        handleShow={handleShow}
+                        key={item?.id}
+                        item={item}
+                      />
+                    ))}
+                  </div>
+                  <div className="w-full sm:w-1/2">
+                    {data?.map((item: any) => (
+                      <ElectionCard
+                        color="#f4f4f4"
+                        handleShow={handleShow}
+                        key={item?.id}
+                        item={item}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <p className="text-xl text-gray-500 ">No Result</p>
+              )}
             </aside>
           </>
         )}

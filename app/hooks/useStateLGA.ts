@@ -26,8 +26,8 @@ export default function useStateLGA() {
   const [stateLga, setStateLga] = useState([]);
   const { user } = useRole();
   const getCountry = async () => {
-    const resp = await getApi(`v1/results/public/countries`);
-    const states = await getApi(`v1/results/public/${resp[0]?.id}/states`);
+    const resp = await getApi(`results/public/countries`);
+    const states = await getApi(`results/public/${resp[0]?.id}/states`);
     setCountryId(resp[0]?.id);
     const results: any = [];
     states?.length > 0 &&
@@ -54,7 +54,7 @@ export default function useStateLGA() {
     setStateReg(find_state[0]?.title);
   };
   const getLga = async () => {
-    const localgovt = await getApi(`v1/results/public/${stateId}/localgovt`);
+    const localgovt = await getApi(`results/public/${stateId}/localgovt`);
     const results: any = [];
     localgovt?.length > 0 &&
       localgovt?.forEach((item: LGAType) => {
@@ -66,7 +66,7 @@ export default function useStateLGA() {
       });
   };
   const getWard = async () => {
-    const wards = await getApi(`v1/results/public/${stateLgaId}/wards`);
+    const wards = await getApi(`results/public/${stateLgaId}/wards`);
     const results: any = [];
     wards?.length > 0 &&
       wards?.forEach((item: WardType) => {
@@ -78,7 +78,7 @@ export default function useStateLGA() {
       });
   };
   const getPollingUnit = async () => {
-    const polling_unit = await getApi(`v1/results/public/${wardId}/pu`);
+    const polling_unit = await getApi(`results/public/${wardId}/pu`);
     const results: any = [];
     polling_unit?.length > 0 &&
       polling_unit?.forEach((item: PollingUnitType) => {

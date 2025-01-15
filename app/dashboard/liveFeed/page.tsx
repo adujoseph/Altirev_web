@@ -5,31 +5,23 @@ import { SearchField } from "@/app/components/Search";
 import useReport from "@/app/hooks/useReport";
 import { ArrowView, FilterView } from "@/app/icons/Arrow";
 import Loading from "@/app/loading";
-import { ReportType } from "@/app/typings";
-import React, { useEffect, useState } from "react";
 
 export default function page() {
   const {
-    reportSearch,
-    reportByID,
+    total_report_search,
     report,
     inputText,
     setInputText,
     details,
     setDetails,
     handleDetails,
+    detailReport,
   } = useReport("");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.scrollTo(0, 0);
-    }
-  }, [details]);
   return (
     <div>
       <h2 className="text-2xl font-bold">Polling Unit Reports</h2>
       <div className="flex flex-col-reverse lg:flex-row">
-        <section className="w-full lg:w-2/3">
+        <section className="w-full lg:w-1/2">
           <Card>
             <div className="flex items-center space-x-4 justify-center p-5 shadow">
               <span className="">
@@ -50,13 +42,14 @@ export default function page() {
                 <span className="flex items-center justify-center">
                   <Loading />
                 </span>
-              ) : reportSearch?.length > 0 ? (
-                reportSearch?.map((i: ReportType) => (
+              ) : total_report_search?.length > 0 ? (
+                total_report_search?.map((i: any) => (
                   <aside
-                    key={i.id}
+                    key={i?.id}
                     onClick={() => handleDetails(i)}
                     className="flex items-center justify-between py-3 px-6 cursor-pointer"
                   >
+
                     <div className="flex items-center space-x-3">
                       {/* <span>
                         <img
@@ -71,9 +64,15 @@ export default function page() {
                           {new Date(i?.createdAt)?.toDateString()}
                         </small>
                       </span>
-                      <p className="p-2 bg-[#FFEFEE] w-max rounded text-sm font-medium">
-                        Report
-                      </p>
+                      {i?.accreditedVoters >= 0 ? (
+                        <p className="p-2 bg-[#E4FFE4] w-max rounded text-sm font-medium">
+                          Result
+                        </p>
+                      ) : (
+                        <p className="p-2 bg-[#FFEFEE] w-max rounded text-sm font-medium">
+                          Report
+                        </p>
+                      )}
                     </div>
                     <p>
                       <ArrowView color="#BCBCBC" />
@@ -92,9 +91,8 @@ export default function page() {
           <div className="w-full lg:w-1/3">
             <PollingDetails
               handleDetails={() => setDetails(false)}
-              loading={reportByID?.isLoading}
-              data={reportByID?.data}
-              type={"report"}
+              data={detailReport}
+              type={detailReport?.accreditedVoters >= 0 ? "result" : "report"}
             />
           </div>
         )}

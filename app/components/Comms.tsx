@@ -14,12 +14,15 @@ import ModalCard from "./modal/Modal";
 import useReport from "../hooks/useReport";
 import Paginate from "./table/table";
 import useResult from "../hooks/useResult";
+import useRole from "../hooks/useRole";
+import { addThousandSeparator } from "../utils";
 
 export default function Comms() {
   const [reportModal, setReportModal] = useState(false);
   const handleModal = () => setReportModal((prev) => !prev);
   const { report } = useReport("");
-  const { result } = useResult("");
+  const { agentLists, activeAgentLists } = useRole();
+  const { results } = useResult("");
   return (
     <section>
       {reportModal && (
@@ -27,7 +30,7 @@ export default function Comms() {
           <SendReport handleModal={handleModal} modal={reportModal} />
         </ModalCard>
       )}
-      <aside className="flex flex-col justify-center items-center sm:items-start sm:justify-start sm:grid sm:grid-cols-3 sm:gap-1 lg:gap-4">
+      <aside className="flex flex-col justify-center items-center sm:items-start sm:flex-row sm:justify-start sm:space-x-5">
         <div className="bg-[#698AE2] rounded-xl p-5 w-[300px] sm:w-[250px] lg:w-[300px] h-[160px] m-4  flex flex-col space-y-5">
           <span className="flex items-center justify-between">
             <p>
@@ -38,11 +41,15 @@ export default function Comms() {
           <div className="flex items-center justify-between font-bold">
             <span className="flex flex-col text-white">
               <p>Total</p>
-              <h1 className="text-xl">0</h1>
+              <h1 className="text-xl">
+                {addThousandSeparator(agentLists?.length ?? 0)}
+              </h1>
             </span>
             <span className="flex flex-col text-white">
               <p>Active</p>
-              <h1 className="text-xl">0</h1>
+              <h1 className="text-xl">
+                {addThousandSeparator(activeAgentLists?.length ?? 0)}
+              </h1>
             </span>
           </div>
         </div>
@@ -55,10 +62,10 @@ export default function Comms() {
           </span>
 
           <h1 className="ml-auto bottom-5 right-5 text-4xl font-semibold absolute">
-            {result?.data?.length ?? 0}
+            {addThousandSeparator(results?.data?.length) ?? 0}
           </h1>
         </div>
-        <div className="bg-white rounded-xl p-5  w-[300px] sm:w-[250px] lg:w-[300px] h-[160px] m-4  flex flex-col space-y-5 relative ">
+        {/* <div className="bg-white rounded-xl p-5  w-[300px] sm:w-[250px] lg:w-[300px] h-[160px] m-4  flex flex-col space-y-5 relative ">
           <div className="flex items-center justify-between">
             <span>
               <h1 className="text-xl font-semibold"> Send Report</h1>
@@ -78,7 +85,7 @@ export default function Comms() {
               <DashboardReportClip />
             </p>
           </span>
-        </div>
+        </div> */}
       </aside>
       <Card>
         <div className="p-5 flex items-center justify-between">

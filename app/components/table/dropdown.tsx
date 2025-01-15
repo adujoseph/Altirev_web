@@ -8,7 +8,6 @@ import MenuItem from "@mui/material/MenuItem";
 import { styled, alpha } from "@mui/material/styles";
 import { useStateContext } from "../../context/context";
 import { useRouter } from "next/navigation";
-import { useContactQuery } from "@/app/hooks/useContact";
 
 interface Body {
   title: string;
@@ -44,9 +43,7 @@ const Dropdown = ({ title, subtitle, data, action }: Props) => {
   const open = Boolean(anchorEl);
   // const userid: string = useAppSelector((state) => state?.user?.user);
   const navigate = useRouter();
-
   const { setEdit, setEditData, setTable } = useStateContext();
-  const { fetchSingleContact } = useContactQuery();
   const handleBtn = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -54,37 +51,35 @@ const Dropdown = ({ title, subtitle, data, action }: Props) => {
     if (action === "view contact") {
       setEdit(true);
       setEditData(data);
-      fetchSingleContact(data?.id)
     }
     if (action === "view result") {
-      setEdit(true);
       navigate.push(`/dashboard/result/${data?.id}`);
-      setEditData(data);
-    }
-    if (action === "view report") {
-      setEdit(true);
-      navigate.push(`/dashboard/report/${data?.id}`);
 
       setEditData(data);
+      setEdit(true);
     }
     // if(action === 'view contact'){
     // setEdit(true);
     // setEditData(data);
     // }
-  };
-    useEffect(() => {
-      // Prefetch the dashboard page
-      navigate.prefetch("/dashboard/report/:{id}");
-      navigate.prefetch(`/dashboard/result/:{id}`);
+    if (action === "view report") {
+      navigate.push(`/dashboard/report/${data?.id}`);
 
-    }, [navigate]);
+      setEditData(data);
+    }
+  };
+
+  useEffect(() => {
+    // Prefetch the dashboard page
+    navigate.prefetch("/dashboard/report/:{id}");
+    navigate.prefetch(`/dashboard/result/:{id}`);
+  }, [navigate]);
 
   const handleClose = (item: string) => {
     setAnchorEl(null);
     if (item === "Suspend") {
       setEdit(true);
       setEditData(data);
-      console.log('data', data)
       setTable("suspend");
     }
     if (item === "Reassign Role") {
@@ -102,13 +97,15 @@ const Dropdown = ({ title, subtitle, data, action }: Props) => {
       setEdit(true);
       setTable("profile");
       setEditData(data);
-
     }
-    if (item === "View Contact") {
+    if (item === "change status") {
       setEdit(true);
-      setTable("profile");
+      setTable("change status");
       setEditData(data);
-
+    }
+    if (item === "view report") {
+      navigate.push(`/dashboard/report/${data?.id}`);
+      setEditData(data);
     }
   };
 

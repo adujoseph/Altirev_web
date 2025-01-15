@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { ApprovedImg, ArrowView, BackArrow, RejectedImg } from "../icons/Arrow";
-import { PollingDetails } from "./PollingDetails";
 import Card from "./Card";
 import { AudioIcon } from "../icons/Close";
 import UserDetails from "./UserDetails";
@@ -15,24 +14,45 @@ import {
   DownloadVotes,
   InvalidVotes,
 } from "../icons/Search";
-import Image from "next/image";
-import voteDown from "../imgs/votedoc.png";
 import { SelecTags } from "./SelectTags";
 import "video-react/dist/video-react.css";
 import { Player } from "video-react";
-import AudioWaveform from "./Waveform";
 import Loading from "../loading";
 import { useRouter } from "next/navigation";
-import { ResultType } from "../typings";
+import { ResultType, User } from "../typings";
+import { useAppSelector } from "../redux/hook";
+import { addThousandSeparator } from "../utils";
+import { patchApi } from "../services";
+import { Toast } from "./Toast";
+import { extractTime } from "./table";
 
 interface Props {
   setEdit: (e: boolean) => boolean;
-  data: ResultType;
   userDetails: any;
+  editData: any;
+  loading: boolean;
+  details: ResultType;
+  setEditData: () => void;
+  setTags: () => void;
+  addTags: () => void;
+  tagsList: any;
+  tags: string;
 }
-export default function ResultDetails({ setEdit, userDetails, data }: Props) {
-  const [details, setDetails] = useState(false);
-  const handleDetails = () => setDetails((prev) => !prev);
+export default function Details({
+  setEdit,
+  userDetails,
+  editData,
+  loading,
+  details,
+  setEditData,
+  addTags,
+  tags,
+  setTags,
+  tagsList,
+}: Props) {
+  const user: User = useAppSelector((state) => state?.user?.user);
+  const [counts, setCounts] = useState([]);
+  const [loading2, setLoading2] = useState(false);
   const [modal4, setModal4] = useState(false);
   const [modal3, setModal3] = useState(false);
   const [modal, setModal] = useState(false);
@@ -42,14 +62,64 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
   const handleModal3 = () => setModal3((prev) => !prev);
   const navigate = useRouter();
   const handleModal4 = () => setModal4((prev) => !prev);
+  const result = details?.createdAt && extractTime(details?.createdAt);
   const back = () => {
     navigate.push("/dashboard/result");
     setEdit(false);
+    setEditData(null);
   };
-    useEffect(() => {
-      // Prefetch the dashboard page
-      navigate.prefetch("/dashboard/result");
-    }, [navigate]);
+  const approveRejectElection = async (status: boolean) => {
+    setLoading2(true);
+    const resp = await patchApi(`polls/status/${details?.id}`, {
+      confirm: status,
+    });
+    if (resp?.response?.data?.message) {
+      Toast({ title: resp?.response?.data?.message, error: true });
+      setLoading2(false);
+      return;
+    } else {
+      Toast({ title: resp?.response?.message, error: false });
+      setLoading2(false);
+    }
+  };
+  const countArr = () => {
+    const array = Object.entries(details?.counts).map(([party, votes]) => ({
+      party,
+      votes: parseInt(votes, 10), // Convert votes to numbers
+    }));
+    setCounts(array);
+  };
+  function isValidURL(string: string) {
+    const urlPattern = new RegExp(
+      "^(https?:\\/\\/)?" + // protocol
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+        "(\\#[-a-z\\d_]*)?$",
+      "i"
+    ); // fragment locator
+    return !!urlPattern.test(string);
+  }
+  const changeResultstatus = async () => {
+    if (details?.status === "pending") {
+      const resp = await patchApi(`polls/change-status/${details?.id}`, {
+      reasons: '',
+      status: 'processing',
+      modifiedBy: user?.altirevId,
+    });
+    
+    }
+    return;
+  };
+
+  useEffect(() => {
+    user?.role === "comms" ? changeResultstatus() : () => {};
+  }, [details?.status, user?.role]);
+
+  useEffect(() => {
+    details?.counts && countArr();
+  }, [details?.counts]);
   return (
     <>
       {modal && (
@@ -59,24 +129,33 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
           handleModal={handleModal}
         />
       )}
-      {modal4 && <SelecTags modal={modal4} handleModal={handleModal4} />}
+      {modal4 && (
+        <SelecTags
+          addTags={addTags}
+          tagsList={tagsList}
+          tags={tags}
+          setTag={setTags}
+          modal={modal4}
+          handleModal={handleModal4}
+        />
+      )}
       {modal2 && (
         <Approve
-          editData={null}
-          loading={false}
+          editData={editData}
+          loading={loading2}
           modal={modal2}
           handleModal={handleModal2}
-          handleSubmit={() => {}}
+          handleSubmit={() => approveRejectElection(true)}
         />
       )}
 
       {modal3 && (
         <Reject
-          editData={null}
-          loading={false}
+          editData={editData}
+          loading={loading2}
           modal={modal3}
           handleModal={handleModal3}
-          handleSubmit={() => {}}
+          handleSubmit={() => approveRejectElection(false)}
           setComment={() => {}}
         />
       )}
@@ -89,29 +168,40 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
         </>
         <p className="font-semibold text-[#272727]">Back</p>
       </span>
-      {data?.id ? (
+      {loading ? (
+        <p>
+          <Loading />
+        </p>
+      ) : details?.id ? (
         <>
           <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="">
-              <h2 className="text-xl font-bold ">{data?.title} Polling Unit</h2>
+              <h2 className="text-xl font-bold capitalize">
+                {details?.location?.pollingUnit?.pollingUnit?.toLowerCase()}{" "}
+                Polling Unit
+              </h2>
               <p className="text-[#272727]">
                 {" "}
-                {data?.createdAt && new Date(data?.createdAt)?.toDateString()}
+                {details?.createdAt &&
+                  new Date(details?.createdAt)?.toDateString()}{" "}
+                / {result?.time12}
               </p>
             </div>
             <div className="flex items-center space-x-2">
-              <span
-                onClick={handleModal4}
-                className="flex items-center space-x-2 text-[#656565] rounded py-2 px-4 w-max border-[1px] border-[#656565] font-semibold cursor-pointer"
-              >
-                <p>Add</p>
-                <p>
-                  <PlusIcon />
-                </p>
-              </span>
-              <h2 className="bg-[#272727] text-white rounded w-max py-2 px-7">
+              {user?.role === "comms" && (
+                <span
+                  onClick={handleModal4}
+                  className="flex items-center space-x-2 text-[#656565] rounded py-2 px-4 w-max border-[1px] border-[#656565] font-semibold cursor-pointer"
+                >
+                  <p>Add</p>
+                  <p>
+                    <PlusIcon />
+                  </p>
+                </span>
+              )}
+              {/* <h2 className="bg-[#272727] text-white rounded w-max py-2 px-7">
                 Presidential Result
-              </h2>
+              </h2> */}
             </div>
           </div>
 
@@ -122,19 +212,19 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
                 <Votes
                   title="Number of Accredited Votes"
                   icon={<Accredited />}
-                  num={data?.accreditedVoters}
+                  num={addThousandSeparator(details?.accreditedVoters ?? 0)}
                 />
                 <p className="sm:h-[80px] m-4 w-0.5 bg-[#CBCBCB]" />
                 <Votes
                   title="Number of Votes Casted"
                   icon={<CastedVotes />}
-                  num={data?.voteCasted}
+                  num={addThousandSeparator(details?.voteCasted ?? 0)}
                 />
                 <p className="sm:h-[80px] m-4 w-0.5 bg-[#CBCBCB]" />
                 <Votes
                   title="Number of Invalid Votes"
                   icon={<InvalidVotes />}
-                  num={data?.accreditedVoters}
+                  num={addThousandSeparator(details?.invalidVotes ?? 0)}
                 />
                 <span
                   onClick={handleModal}
@@ -163,10 +253,19 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
                       </p>
                       <hr className="my-4" />
                       <div className="bg-[#CBCBCB] flex items-center justify-center p-2 flex-col relative">
-                        <Image src={data?.fileUrl ?? ""} alt="doc" />
-                        <p className="ml-auto  absolute bottom-3 cursor-pointer right-10">
+                        <img
+                          className="size-[100px] "
+                          src={details?.fileUrl ?? ""}
+                          alt="doc"
+                        />
+                        <a
+                          download
+                          target="_blank"
+                          href={details?.fileUrl ?? ""}
+                          className="ml-auto  absolute bottom-3 cursor-pointer right-10"
+                        >
                           <DownloadVotes />
-                        </p>
+                        </a>
                       </div>
                     </div>
                   </section>
@@ -175,7 +274,7 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
                       Video File of Vote Count
                     </h2>
 
-                    {data?.videoUrl ? (
+                    {isValidURL(details?.videoUrl) ? (
                       <>
                         <p className="text-sm">
                           This video shows the process of counting the votes.
@@ -185,7 +284,7 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
                         <div>
                           {/* videos */}
                           <Player>
-                            <source src={data.videoUrl ?? ""} />
+                            <source src={details?.videoUrl ?? ""} />
                           </Player>
                         </div>
                       </>
@@ -196,7 +295,7 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
                   <span className="my-2">
                     <h2 className="font-semibold">Audio Recording</h2>
 
-                    {data?.audioUrl ? (
+                    {isValidURL(details?.audioUrl) ? (
                       <>
                         <p className="text-sm">
                           Audio recording during the election.
@@ -210,7 +309,7 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
                           {/* <AudioWaveform /> */}
                           <audio
                             className="w-1/2 bg-slate-500 p-4 h-1/2"
-                            src={data?.audioUrl ?? ""}
+                            src={details?.audioUrl ?? ""}
                           ></audio>
                         </div>
                       </>
@@ -226,21 +325,21 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
               <Card>
                 <h2 className="shadow w-full py-4 px-6">Party Votes</h2>
                 <div className="p-5 flex flex-col space-y-2">
-                  <span className="flex flex-col">
-                    <p className="text-[#656565]">Overall votes for APC</p>
-                    <h2 className="font-semibold">0</h2>
-                  </span>
-                  <span className="flex flex-col">
-                    <p className="text-[#656565]">Overall votes for PDP</p>
-                    <h2 className="font-semibold">0</h2>
-                  </span>
-                  <span className="flex flex-col">
-                    <p className="text-[#656565]">Overall votes for LP</p>
-                    <h2 className="font-semibold">0</h2>
-                  </span>
+                  {counts?.length > 0
+                    ? counts?.map((i) => (
+                        <span className="flex flex-col">
+                          <p className="text-[#656565]">
+                            Overall votes for {i?.party}
+                          </p>
+                          <h2 className="font-semibold">
+                            {addThousandSeparator(i?.votes ?? 0)}
+                          </h2>
+                        </span>
+                      ))
+                    : null}
                 </div>
               </Card>
-              {data?.status === "pending" && (
+              {details?.status === "processing" && user?.role === "comms" && (
                 <Card>
                   <div className="flex items-center justify-center flex-col p-5 space-y-2">
                     <button
@@ -258,28 +357,32 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
                   </div>
                 </Card>
               )}
-              {data?.status === "rejected" && (
+              {details?.status === "rejected" && (
                 <Card>
                   <div className="p-5">
                     <h2 className="font-semibold"> Reason for Rejection</h2>
                     <hr className="bg-black my-2 h-0.5" />
-                    <p>Not detailed enough and the video part is missing</p>
+                    <p>{details?.reasons}</p>
                   </div>
                 </Card>
               )}
-              {data?.status === "rejected" && (
+              {details?.status === "rejected" && (
                 <Card>
                   <div className="p-5 relative">
-                    <p>{data?.status === "rejected" && <RejectedImg />}</p>
-                    <p className="bottom-3 right-3 absolute">Bolaji Raphael</p>
+                    <p>{details?.status === "rejected" && <RejectedImg />}</p>
+                    <p className="bottom-3 right-3 absolute">
+                      {user?.firstName}
+                    </p>
                   </div>
                 </Card>
               )}
-              {data?.status === "approved" && (
+              {details?.status === "approved" && (
                 <Card>
                   <div className="p-5 relative">
-                    <p>{data?.status === "approved" && <ApprovedImg />}</p>
-                    <p className="bottom-3 right-3 absolute">Bolaji Raphael</p>
+                    <p>{details?.status === "approved" && <ApprovedImg />}</p>
+                    <p className="bottom-3 right-3 absolute">
+                      {user?.firstName}
+                    </p>
                   </div>
                 </Card>
               )}
@@ -287,9 +390,7 @@ export default function ResultDetails({ setEdit, userDetails, data }: Props) {
           </section>
         </>
       ) : (
-        <p>
-          <Loading />
-        </p>
+        <p className="text-center">No results</p>
       )}
     </>
   );
