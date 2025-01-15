@@ -59,8 +59,7 @@ export const getSingleResult = async (id: string) => {
   return res;
 };
 export const getTenantReports = async (id: string) => {
-  const res = await getApi(`reports`);
-  // const res = await getApi(`reports/tenant/${id}`);
+  const res = await getApi(`reports/tenant/${id}`);
   return res;
 };
 export const getTenantResult = async (id: string) => {
