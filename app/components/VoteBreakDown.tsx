@@ -1,20 +1,23 @@
+import { useEffect, useState } from "react";
+import { politicalPartyNames } from "../constant/paries";
 import { BackArrow, FilterView } from "../icons/Arrow";
+import { addThousandSeparator } from "../utils";
 import Card from "./Card";
-import PieChart, { ChartData } from "./Chart";
+// import PieChart, { ChartData } from "./Chart";
+import BarChartRace from "./d3Chart";
 
 interface Props {
-  bar: number;
   data?: any;
-  options: any;
   setView: (e?: number) => void;
 }
 
-export const VoteBreakDown = ({ data, options, setView, bar }: Props) => {
+export const VoteBreakDown = ({ data, setView }: Props) => {
+
   return (
     <div>
       <span
-        onClick={() => setView(1)}
-        className="flex items-center cursor-pointer space-x-1"
+        onClick={() => setView(2)}
+        className="flex items-center cursor-pointer space-x-1 p-5"
       >
         <p>
           <BackArrow color="#272727" />
@@ -28,23 +31,30 @@ export const VoteBreakDown = ({ data, options, setView, bar }: Props) => {
         </p>
       </span>
       <hr className="my-4" />
-      <section className="flex">
-        <div className="w-full sm:w-2/3 ">
+      <section className="flex flex-col lg:flex-row">
+        <div className="w-full lg:w-3/4">
           <Card>
-            <div className="flex items-center justify-center p-6">
-              <ChartData type="BarChart" data={data} options={options} />{" "}
-              {/* <PieChart type="bar" /> */}
-            </div>
+            {data?.results?.length > 0 ? (
+              <BarChartRace data={data?.results} />
+            ) : (
+              <p className="text-gray-500 p-10">No data available</p>
+            )}
           </Card>
         </div>
-        <div className="w-1/3 flex flex-col space-y-3 h-screen overflow-y-scroll">
+        <div className="w-full lg:w-1/4">
           <Card>
-            {[...Array(11)].map((i) => (
-              <div className="flex items-center justify-between m-2 px-4 py-1">
-                <h2 className="text-sm">Accord</h2>
-                <p className="text-sm">0%</p>
-              </div>
-            ))}
+            <div className=" flex flex-col space-y-3 h-screen overflow-y-scroll">
+              {data?.results?.map((i: any) => (
+                <div className="flex items-center justify-between my-1 px-3 py-1">
+                  <span className="flex items-center space-x-1">
+                    <p className="text-xs">{i?.partyName}</p>
+                  </span>
+                  <p className="text-sm font-semibold">
+                    {((i?.partyVote / data?.totalVotes) * 100)?.toFixed(0)}%
+                  </p>
+                </div>
+              ))}
+            </div>
           </Card>
         </div>
       </section>

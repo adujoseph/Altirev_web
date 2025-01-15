@@ -3,7 +3,6 @@ import { CirclePlus, DashboardAgent, DashboardHat } from "../icons/Dashboard";
 import { EditIcon } from "../icons/Edit";
 import SkeletonTable from "./skeleton/Table";
 import Paginate from "./table/table";
-import { testApi } from "../constant";
 import { SearchField } from "@/app/components/Search";
 import Card from "@/app/components/Card";
 import { FilterVotes } from "@/app/components/FilterVotes";
@@ -14,6 +13,7 @@ import { FilterView } from "../icons/Arrow";
 import ModalCard from "./modal/Modal";
 import AssignRoles from "./AssignRoles";
 import useRole from "../hooks/useRole";
+import useReport from "../hooks/useReport";
 
 function Role() {
   const {
@@ -34,14 +34,43 @@ function Role() {
     userSearch,
     agentList,
     commsList,
+    loading,
+    suspendUser,
   } = useRole();
+    const {
+      states,
+      stateLga,
+      setStateId,
+      stateId,
+      setStateLgaId,
+      stateLgaId,
+      setWardId,
+      pollingUnit,
+      setPollingUnitId,
+      wardId,
+      pollingUnitId,
+      ward,
+    } = useReport("");
   return (
     <div>
       {modal && <AssignRoles modal={modal} handleModal={handleModal} />}
 
       {modal2 && (
         <ModalCard open={modal2} setOpen={handleModal2}>
-          <FilterVotes setModal={setModal2} />
+          <FilterVotes
+            states={states}
+            stateLga={stateLga}
+            setStateId={setStateId}
+            stateId={stateId}
+            setStateLgaId={setStateLgaId}
+            stateLgaId={stateLgaId}
+            setWardId={setWardId}
+            pollingUnit={pollingUnit}
+            setPollingUnitId={setPollingUnitId}
+            pollingUnitId={pollingUnitId}
+            wardId={wardId}
+            ward={ward}
+          />
         </ModalCard>
       )}
       {modal3 && (
@@ -50,14 +79,18 @@ function Role() {
         </ModalCard>
       )}
       {edit && table === "suspend" && (
-        <Suspend handleModal={() => setEdit(false)} modal={edit} />
+        <Suspend
+          loading={loading}
+          suspendUser={suspendUser}
+          handleModal={() => setEdit(false)}
+          modal={edit}
+        />
       )}
       {edit && table === "reassign" && (
         <AssignRoles
           data={editData}
           handleModal={() => setEdit(false)}
           modal={edit}
-          user={user}
         />
       )}
       {edit && table === "profile" && (
@@ -98,11 +131,11 @@ export const RoleCard = ({ handleModal3, commsList, agentList }: any) => (
       <div className="flex items-center justify-between font-bold">
         <span className="flex flex-col text-white">
           <p>Total</p>
-          <h1 className="text-xl">{agentList}</h1>
+          <h1 className="text-xl">{agentList ?? 0}</h1>
         </span>
         <span className="flex flex-col text-white">
           <p>Active</p>
-          <h1 className="text-xl">{agentList}</h1>
+          <h1 className="text-xl">{agentList ?? 0}</h1>
         </span>
       </div>
     </div>
@@ -116,11 +149,11 @@ export const RoleCard = ({ handleModal3, commsList, agentList }: any) => (
       <div className="flex items-center justify-between font-bold">
         <span className="flex flex-col text-white">
           <p>Total</p>
-          <h1 className="text-xl">{commsList}</h1>
+          <h1 className="text-xl">{commsList ?? 0}</h1>
         </span>
         <span className="flex flex-col text-white">
           <p>Active</p>
-          <h1 className="text-xl">{commsList}</h1>
+          <h1 className="text-xl">{commsList ?? 0}</h1>
         </span>
       </div>
     </div>

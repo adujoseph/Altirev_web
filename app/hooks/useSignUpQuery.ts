@@ -1,9 +1,9 @@
-="use client";
+"use client";
 import { useMutation } from "@tanstack/react-query";
 import { Toast } from "../components/Toast";
-import { useAppDispatch, useAppSelector } from "../redux/hook";
-import { login, logout } from "../redux/userSlice";
-import { getApi, postApi } from "../services";
+import { useAppDispatch } from "../redux/hook";
+import { logout } from "../redux/userSlice";
+import { postApi } from "../services";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import { useEffect, useRef, useState } from "react";
@@ -16,21 +16,17 @@ export const useSignUpQuery = () => {
   const [view, setView] = useState(0);
   const [loading2, setLoading2] = useState(false);
   const length = 6;
-  const [modal, setModal] = useState(false);
   const [code, setCode] = useState("");
   const [otp, setOtp] = useState(Array(length).fill(""));
   const navigate = useRouter();
   const [loading, setLoading] = useState(false);
   const [seconds, setSeconds] = useState(90); // 1:30 minutes in second9
-  const { planId } = useStateContext();
+  const { planId, setPlanId, setEmailRef, setPayRef, payRef, emailRef } =
+    useStateContext();
   const { states, stateReg, setStateId, stateId } = useStateLGA();
   const [value, setValue] = useState("");
   const [country, setCountry] = useState("Nigeria");
   const inputRefs: any = useRef([]);
-  const [sex, setSex] = useState("male");
-  const handleModal = () => setModal((prev) => !prev);
-  const paymentRef = localStorage.getItem("payRef") ?? "";
-  const email = localStorage.getItem("email") ?? "";
   const handleInputChange = (value: string, index: number) => {
     const updatedOtp = [...otp];
     updatedOtp[index] = value;
@@ -87,14 +83,22 @@ export const useSignUpQuery = () => {
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
   const defaultValue = {
-    email,
-    password: "",
-    cpassword: "",
+    email: emailRef,
     username: "",
     lname: "",
     fname: "",
   };
   const validationSchema = yup.object().shape({
+    lname: yup.string().label("lname").required("lastname is required"),
+    fname: yup.string().label("fname").required("firstname is required"),
+    username: yup.string().label("username").required("username is required"),
+    email: yup
+      .string()
+      .label("email")
+      .email("Invalid email")
+      .required("Email is required"),
+  });
+  const validationSchema2 = yup.object().shape({
     lname: yup.string().label("lname").required("lastname is required"),
     fname: yup.string().label("fname").required("firstname is required"),
     username: yup.string().label("username").required("username is required"),
@@ -139,15 +143,15 @@ export const useSignUpQuery = () => {
     if (!value) {
       Toast({ title: "Input Phone Number", error: true });
       setSubmitting(false);
-
       return;
     }
-    if (!stateId) {
-      Toast({ title: "Select State", error: true });
-      setSubmitting(false);
+    // if (!stateId) {
+    //   Toast({ title: "Select State", error: true });
+    //   setSubmitting(false);
 
-      return;
-    } else {
+    //   return;
+    // }
+    else {
       mutate();
     }
   };
@@ -159,24 +163,12 @@ export const useSignUpQuery = () => {
     lastName: values.lname,
     username: values.username,
     phoneNumber: value,
-    gender: sex,
     state: stateReg,
     country: country,
-    paymentRef: paymentRef,
+    paymentRef: payRef,
     planId: planId,
   };
-  const pay_load: any = {
-    email: values.email,
-    password: values.password,
-    firstName: values.fname,
-    lastName: values.lname,
-    username: values.username,
-    phoneNumber: value,
-    gender: sex,
-    state: stateReg,
-    country: country,
-  };
-const signUpPayload = paymentRef ? payload:pay_load
+
   const payload2: any = {
     email: values.email,
     phone: value,
@@ -186,8 +178,10 @@ const signUpPayload = paymentRef ? payload:pay_load
     mutationFn: () => postApi(`v1/auth/initiate`, payload2),
     onSuccess: (data) => {
       if (data?.status === "success") {
+        console.log("data", data);
         Toast({ title: data?.message, error: false });
         setSubmitting(false);
+        getOtp();
         setView(2);
         return;
       }
@@ -204,7 +198,7 @@ const signUpPayload = paymentRef ? payload:pay_load
       setSubmitting(false);
     },
     onError: (error) => {
-      console.log("there was an error", error);
+      console.error("there was an error", error);
     },
   });
 
@@ -226,6 +220,7 @@ const signUpPayload = paymentRef ? payload:pay_load
       Toast({ title: res?.message, error: false });
     }
   };
+
   const validateOtp = async () => {
     const payload = {
       email: values.email,
@@ -236,7 +231,9 @@ const signUpPayload = paymentRef ? payload:pay_load
       const res = await postApi("v1/auth/verifyOtp", payload);
       if (res.status === "success") {
         Toast({ title: res.message, error: false });
-        register();
+        // register();
+        setView(1);
+
         return;
       }
       Toast({ title: res.response?.data?.message, error: true });
@@ -244,20 +241,48 @@ const signUpPayload = paymentRef ? payload:pay_load
       setOtp(Array(length).fill(""));
     }
   };
-  const register = async () => {
-    const resp = await postApi("v1/auth/register", signUpPayload);
-    if (resp?.token) {
-      dispatch(login(resp?.user));
-      localStorage.setItem("auth", resp?.token);
-      setLoading(false);
-      setModal(true);
-      handleReset(signUpPayload);
-      return;
-    }
-    setLoading(false);
-    Toast({ title: "Error Occurred", error: true });
-    setOtp(Array(length).fill(""));
-  };
+
+  // const register = async () => {
+  //   if (values.password === '') {
+  //     Toast({ title: "Input Password", error: true });
+  //     setSubmitting(false);
+  //     return;
+  //   }
+  //   if (values.cpassword === '') {
+  //     Toast({ title: "Input Confirm Password", error: true });
+  //     setSubmitting(false);
+  //     return;
+  //   }
+  //   if (values.cpassword === '') {
+  //     Toast({ title: "Input Confirm Password", error: true });
+  //     setSubmitting(false);
+  //     return;
+  //   }
+  //   if (!stateId) {
+  //     Toast({ title: "Select State", error: true });
+  //     setSubmitting(false);
+
+  //     return;
+  //   }else{
+  //   setLoading(true);
+  //   const resp = await postApi("v1/auth/register", signUpPayload);
+  //   if (resp?.token) {
+  //     setPayRef("");
+  //     setEmailRef("");
+  //     setPlanId("");
+  //     dispatch(login(resp?.user));
+  //     setLoading(false);
+  //     setModal(true);
+  //     handleReset(signUpPayload);
+  //     localStorage.setItem("auth", resp?.token);
+
+  //     return;
+  //   }
+  // }
+  //   setLoading(false);
+  //   Toast({ title: "Error Occurred", error: true });
+  //   setOtp(Array(length).fill(""));
+  // };
 
   const handleLogout = () => {
     navigate.push("/login");
@@ -271,7 +296,6 @@ const signUpPayload = paymentRef ? payload:pay_load
     // Prefetch the dashboard page
     navigate.prefetch("/dashboard");
     navigate.prefetch("/login");
-
   }, [navigate]);
   return {
     handleSubmit,
@@ -286,8 +310,6 @@ const signUpPayload = paymentRef ? payload:pay_load
     setOtp,
     view,
     setView,
-    setModal,
-    modal,
     otp,
     length,
     handleLogout,
@@ -300,9 +322,6 @@ const signUpPayload = paymentRef ? payload:pay_load
     formatTime,
     handleKeyPress,
     handleInputChange,
-    handleModal,
-    sex,
-    setSex,
     inputRefs,
     states,
     stateId,

@@ -5,7 +5,7 @@ import { tree } from "next/dist/build/templates/app-page";
 
 export default function SectionOne() {
   return (
-    <div className=" w-full sm:w-3/4 mx-auto my-20 ">
+    <div id='services' className=" w-full sm:w-3/4 mx-auto my-20 ">
       <h2 className="text-[#2550C0] text-3xl text-center font-medium my-4">Our Unique Value Proposition</h2>
       <p className="text-center my-4 w-3/4 mx-auto">
         We specialize in providing impartial and expert monitoring to promote

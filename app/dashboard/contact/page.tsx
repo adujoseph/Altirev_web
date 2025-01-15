@@ -9,6 +9,8 @@ import { FilterVotes } from "@/app/components/FilterVotes";
 import ModalCard from "@/app/components/modal/Modal";
 import UserDetails from "@/app/components/UserDetails";
 import { useContactQuery } from "@/app/hooks/useContact";
+import useAuth from "@/app/components/Auth";
+import useReport from "@/app/hooks/useReport";
 
 export default function page() {
   const {
@@ -20,19 +22,47 @@ export default function page() {
     handleModal,
     inputText,
     setInputText,
-    contactSearch,
+    contactSearch,userDetails
   } = useContactQuery();
+  // const { user } = useAuth("moderator");
+  const {
+    states,
+    stateLga,
+    setStateId,
+    stateId,
+    setStateLgaId,
+    stateLgaId,
+    setWardId,
+    pollingUnit,
+    setPollingUnitId,
+    wardId,
+    pollingUnitId,
+    ward,
+  } = useReport("");
 
   return (
     <div>
       {modal && (
         <ModalCard open={modal} setOpen={handleModal}>
-          <FilterVotes />
+          <FilterVotes
+            states={states}
+            stateLga={stateLga}
+            setStateId={setStateId}
+            stateId={stateId}
+            setStateLgaId={setStateLgaId}
+            stateLgaId={stateLgaId}
+            setWardId={setWardId}
+            pollingUnit={pollingUnit}
+            setPollingUnitId={setPollingUnitId}
+            pollingUnitId={pollingUnitId}
+            wardId={wardId}
+            ward={ward}
+          />
         </ModalCard>
       )}
       {edit && (
         <UserDetails
-          data={null}
+          data={userDetails}
           modal={edit}
           handleModal={() => setEdit(false)}
         />
@@ -79,8 +109,8 @@ export default function page() {
               className="p-3 outline-none text-center capitalize cursor-pointer font-semibold"
             >
               <option value="">all</option>
-              <option value="pending">pending</option>
-              <option value="approved">approved</option>
+              <option value="active">active</option>
+              <option value="inactive">inactive</option>
             </select>
           </div>
         </aside>

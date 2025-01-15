@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Copy } from "../icons/ManageUser";
 import { EyeIcons, EyeSlash } from "../icons/Social";
- import sanitizeHtml from "sanitize-html";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -25,10 +24,8 @@ export default function Input({
   const handleShowPassword = () => {
     setShowPassword((prev) => !prev);
   };
-const clean = sanitizeHtml(value);
   return (
     <div
-      // dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
       className="login font-semibold capitalize flex flex-col w-full"
     >
       <label htmlFor={label} className="text-sm font-medium">

@@ -1,30 +1,18 @@
 "use client";
 import React from "react";
-import { Chart as Charts } from "react-google-charts";
 import Chart from "react-apexcharts";
 
-export function ChartData({ data, options, type }: any) {
-  return (
-    <Charts
-      chartType={"BarChart"}
-      data={data}
-      options={options}
-      className="w-[400px]"
-      width={"100%"}
-      height={"400px"}
-    />
-  );
-}
-
-const PieChart = () => {
+const PieChart = ({electiondetails}:any) => {
+  const partyName = electiondetails?.resultArray?.map((item:any) => item?.partyName);
+  const partyVote = electiondetails?.resultArray?.map((item:any) => item?.partyVote);
   const chartOptions = {
-    labels: [" A", " B", " C", " D"],
+    labels:partyName,
     responsive: [
       {
-        breakpoint: 480,
+        breakpoint: 80,
         options: {
           chart: {
-            width: 300,
+            width: 400,
           },
           legend: {
             position: "bottom",
@@ -33,18 +21,22 @@ const PieChart = () => {
       },
     ],
   };
-
-  const chartSeries = [44, 55, 13, 33]; // Corresponding data for each label
+// Corresponding data for each label
+  const chartSeries = partyVote;
 
   return (
     <>
+      {chartSeries?.length > 0 ?
       <Chart
         options={chartOptions}
         series={chartSeries}
         type="pie"
-        width="380"
-        height={"380"}
-      />
+        width="480"
+        height={"480"}
+      /> :
+            <p className="text-gray-500 p-10">
+              No data available
+            </p>}
     </>
   );
 };

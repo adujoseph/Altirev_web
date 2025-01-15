@@ -45,29 +45,29 @@ export const useSettingQuery = () => {
     e?.preventDefault()
     mutate()
   }
-    const getExpiration  = async () => {
-      try {
-        const resp = await postApi("v1/auth/refresh",'');
-        return resp.data
-      } catch (error) {
-        console.error("Er", error);
-      }
-    };
-    const authCheck = useQuery({
-      queryKey: ["authCheck"],
-      queryFn: getExpiration,
-      refetchOnReconnect: true,
-      retry: 5,
-      retryDelay: 100,
-      staleTime: 5000,
-      refetchOnMount: true,
-      refetchInterval: 120000, // 2 minutes
-      refetchIntervalInBackground: true,
-      onSuccess(data: any) {
-        //   Toast({ title: "page refreshed", error: false });
-      },
-      onError: (error: any) => console.error(error),
-    });
+    // const getExpiration  = async () => {
+    //   try {
+    //     const resp = await postApi("v1/auth/refresh",'');
+    //     return resp.data
+    //   } catch (error) {
+    //     console.error("Er", error);
+    //   }
+    // };
+    // const authCheck = useQuery({
+    //   queryKey: ["authCheck"],
+    //   queryFn: getExpiration,
+    //   refetchOnReconnect: true,
+    //   retry: 5,
+    //   retryDelay: 100,
+    //   staleTime: 5000,
+    //   refetchOnMount: true,
+    //   refetchInterval: 120000, // 2 minutes
+    //   refetchIntervalInBackground: true,
+    //   onSuccess(data: any) {
+    //     //   Toast({ title: "page refreshed", error: false });
+    //   },
+    //   onError: (error: any) => console.error(error),
+    // });
   return {
     loading,
     setLoading,
@@ -87,7 +87,6 @@ export const useSettingQuery = () => {
     addUserModal,
     user,
     setAddUserModal,
-    handleSubmit,
-    authCheck,
+    handleSubmit
   };
 }

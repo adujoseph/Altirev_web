@@ -76,7 +76,7 @@ export const useForgotQuery = (hash: string) => {
       Toast({ title: data.message, error: true });
     },
     onError: (error) => {
-      console.log("there was an error", error);
+      console.error("there was an error", error);
     },
   });
 

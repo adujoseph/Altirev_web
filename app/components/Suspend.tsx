@@ -6,25 +6,18 @@ import { dataTagSymbol } from "@tanstack/react-query";
 
 interface SuspendProps {
   modal: boolean;
+  loading: boolean;
   handleModal: () => void;
   editData?: any;
-  user?: any;
+  suspendUser?: any;
 }
 export const Suspend = ({
   modal,
   handleModal,
   editData,
-  user,
+  suspendUser,
+  loading
 }: SuspendProps): JSX.Element => {
-  const { loading, assignRole, setEmail, setRole, setStateId } =
-    useAddUser(user);
-  useEffect(() => {
-    if (editData?.email) {
-      setEmail(editData?.email);
-      setRole("user");
-      setStateId(editData?.state);
-    }
-  }, [editData?.email]);
   return (
     <>
       <ModalCard setOpen={handleModal} open={modal}>
@@ -43,7 +36,7 @@ export const Suspend = ({
               loading={false}
             />
             <Button
-              onClick={assignRole}
+              onClick={suspendUser}
               label="Suspend"
               styles="bg-[#FFA500] text-sm rounded mx-auto mt-4 w-1/2"
               loading={loading}

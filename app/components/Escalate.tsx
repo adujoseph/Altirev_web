@@ -1,22 +1,25 @@
-import Button from './Button'
-import ModalCard from './modal/Modal'
+import React from "react";
+import Button from "./Button";
+import ModalCard from "./modal/Modal";
 
 interface ApproveProps {
   modal: boolean;
   handleModal: () => void;
-  editData: any;
   handleSubmit: (e: any, t?: any) => void;
   loading: boolean;
+  success: boolean;
 }
 export const Escalate = ({
   modal,
   handleModal,
   handleSubmit,
-  editData,
-  loading,
+  loading,success
 }: ApproveProps): JSX.Element => (
   <>
     <ModalCard setOpen={handleModal} open={modal}>
+          {success ? (
+        <SuccessMessage handleModal={handleModal} />
+      ) : (
       <div>
         <h2 className="font-bold text-xl">Escalate Report</h2>
         <hr className="my-5" />
@@ -32,13 +35,27 @@ export const Escalate = ({
             loading={false}
           />
           <Button
-            onClick={() => handleSubmit(editData)}
+            onClick={() => handleSubmit("escalated")}
             label="Escalate"
             styles="bg-[#272727] rounded mx-auto mt-4 w-1/2"
             loading={loading}
           />
         </div>
-      </div>
+      </div>)}
     </ModalCard>
   </>
+);
+
+export const SuccessMessage = ({ handleModal }: { handleModal: () => void }) => (
+  <div className="flex items-center flex-col space-y-4 justify-center ">
+    <h2 className="mt-10 w-2/3 capitalize text-xl font-bold text-center text-[#2550C0]">
+      Election Report escalated successfully!
+    </h2>
+    <Button
+      onClick={handleModal}
+      label="Done"
+      styles="bg-[#2550C0] rounded mx-auto mt-4 w-full"
+      loading={false}
+    />
+  </div>
 );

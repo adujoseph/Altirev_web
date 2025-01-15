@@ -12,6 +12,10 @@ import classNames from "classnames";
 import { User } from "../typings";
 import { postApi } from "../services";
 import { useSettingQuery } from "../hooks/useSettingQuery";
+import Image from "next/image";
+import profile from "../imgs/profile.png";
+import { Close, Close2 } from "../icons/Close";
+import { Logo } from "../icons/Logo";
 
 export default function Sidebar() {
   const { openMenu, title, setEdit, setOpenMenu } = useStateContext();
@@ -19,7 +23,7 @@ export default function Sidebar() {
   const user: User = useAppSelector((state) => state?.user?.user);
   const dispatch = useDispatch();
   const navigate = useRouter();
-  const { authCheck } = useSettingQuery();
+  // const { authCheck } = useSettingQuery();
   const sideBar =
     title === "moderator"
       ? list3
@@ -33,6 +37,7 @@ export default function Sidebar() {
   const logoutFn = async () => {
     navigate.push("/login");
     const resp = await postApi("v1/auth/logout", "");
+    localStorage.clear();
     dispatch(logout());
   };
   const [windowSize, setWindowSize] = useState({
@@ -51,15 +56,14 @@ export default function Sidebar() {
 
   useMemo(() => {
     windowSize.width <= 1000 ? setOpenMenu(false) : setOpenMenu(true);
-  }, [windowSize]);
+  }, [windowSize, pathname]);
 
   useLayoutEffect(() => {
     if (!user?.email) navigate.push("/login");
   }, [user?.email]);
 
   const reset = () => {
-    setEdit(false)
-
+    setEdit(false);
   };
   useEffect(() => {
     // Prefetch the page
@@ -68,27 +72,31 @@ export default function Sidebar() {
   return (
     <div
       className={classNames("", {
-        "w-[220px] flex items-center pt-5 flex-col h-screen bg-[#F3F3F3] shadow fixed top-0 left-0":
+        "w-[220px] flex items-center pt-5 flex-col h-screen bg-[#F3F3F3] z-[99999] shadow fixed top-0 left-0":
           openMenu,
         "hidden w-0 ": !openMenu,
       })}
     >
-      <div>
+      <p onClick={() => setOpenMenu(false)} className="ml-auto xl:hidden cursor-pointer">
+        <Close2 />
+      </p>
+      <div className="">
         <Link
-        prefetch
+          prefetch
           href="/dashboard"
-          className="flex mb-10 text-white text-xl font-semibold size-20 p-2 items-center justify-center bg-[#2550C0] rounded-full"
+          className=""
         >
-          LOGO
+                    <Logo/>
+
         </Link>
       </div>
-      <ul className="flex flex-col space-y-5">
+      <ul className="flex flex-col space-y-5 sm:space-y-7 sm:mt-10">
         {sideBar?.map((cat) => (
           <Link
             href={cat.path}
-            className="flex items-center space-x-3 cursor-pointer"
+            className="flex items-center space-x-5 cursor-pointer"
             key={cat.title}
-            prefetch={true}
+            prefetch
             onClick={reset}
           >
             <p>
@@ -128,11 +136,8 @@ export default function Sidebar() {
         href="/dashboard/profile"
         className="absolute bottom-2 lg:bottom-10 left-0 flex items-center justify-center space-x-4 mx-auto w-full capitalize cursor-pointer"
       >
-        <img
-          className="h-7 rounded-full "
-          src="https://www.clipartmax.com/png/middle/83-836357_greg-ezeilo-avatar-icon-png.png"
-          alt="profile"
-        />
+        <Image src={profile} className="" alt="profile" />
+
         <p>{user?.firstName}</p>
       </Link>
     </div>

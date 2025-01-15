@@ -7,32 +7,45 @@ import ArrowDown from "../../icons/ArrowDown";
 import ArrowUp from "../../icons/ArrowUp";
 import { SquareIcon } from "../../icons/ManageUser";
 import Dropdown from "./dropdown";
-import { useAppSelector } from "@/app/redux/hook";
 import { ArrowView } from "@/app/icons/Arrow";
 import { usePathname } from "next/navigation";
-
+import moment from 'moment'
 export function Products({ data, dropdown, action, color }) {
-  const [products, setProducts] = useState(data);
+  const [products, setProducts] = useState([]);
   const pathname = usePathname();
-  const user = useAppSelector((state) => state?.user?.user);
+ 
   const productsData = useMemo(
     () =>
       products?.length > 0
         ? products?.map((product) => {
-            if (product.created_at) {
-              let newDate = new Date(product.created_at).toDateString();
+            if (product?.created_at) {
+              let newDate = new Date(product?.created_at).toDateString();
               product.created_at = newDate;
             }
-            if (product.createdAt) {
-              let newDate = new Date(product.createdAt).toDateString();
-              product.createdAt = newDate;
+            if (product?.createdAt) {
+              const result = extractTime(product?.createdAt);
+
+              let newDate = new Date(product?.createdAt).toDateString();
+              product.createdAt = `${newDate} / ${result.time12}`;
             }
-            if (product.electionDate) {
-              let newDate = new Date(product.electionDate).toDateString();
+            if (product?.endDate) {
+              let newDate = new Date(product?.endDate).toDateString();
+              product.endDate = newDate;
+            }
+            if (product?.startDate) {
+              let newDate = new Date(product?.startDate).toDateString();
+              product.startDate = newDate;
+            }
+            if (product?.electionDate) {
+              let newDate = new Date(product?.electionDate).toDateString();
               product.electionDate = newDate;
             }
-            if (product.dateCreated) {
-              let newDate = new Date(product.dateCreated).toDateString();
+            if (product?.phoneNumber) {
+              let phoneNumber = product?.phoneNumber?.replace("+234", "0");
+              product.phoneNumber = phoneNumber;
+            }
+            if (product?.dateCreated) {
+              let newDate = new Date(product?.dateCreated).toDateString();
               product.dateCreated = newDate;
             }
             return product;
@@ -60,7 +73,34 @@ export function Products({ data, dropdown, action, color }) {
                 key !== "socialId" &&
                 key !== "tenantId" &&
                 key !== "userAltirevId" &&
+                key !== "imageUrl" &&
+                key !== "modifiedBy" &&
                 key !== "altirevId" &&
+                key !== "firstName" &&
+                key !== "lastName" &&
+                key !== "title" &&
+                key !== "country" &&
+                // key !== "state" &&
+                key !== "isActive" &&
+                key !== "gender" &&
+                // key !== "createdAt" &&
+                key !== "dateCreated" &&
+                key !== "reasons" &&
+                key !== "message" &&
+                key !== "requestCall" &&
+                key !== "location__entity" &&
+                key !== "__entity" &&
+                key !== "location" &&
+                key !== "previousPassword" &&
+                key !== "lastReportTime" &&
+                key !== "invalidVotes" &&
+                key !== "counts" &&
+                key !== "locationId" &&
+                key !== "accreditedVoters" &&
+                key !== "voteCasted" &&
+                key !== "electionId" &&
+                key !== "password" &&
+                key !== "date" &&
                 key !== "provider" &&
                 key !== "id" &&
                 key !== "userId" &&
@@ -78,8 +118,7 @@ export function Products({ data, dropdown, action, color }) {
                 return {
                   Header: "date",
                   accessor: key,
-                  Cell: ({ value }) =>
-                    value.length >= 20 ? `${value.slice(0, 20)}...` : value,
+                  Cell: ({ value }) =>value,
                 };
               }
               if (key === "created_at") {
@@ -87,7 +126,9 @@ export function Products({ data, dropdown, action, color }) {
                   Header: "date",
                   accessor: key,
                   Cell: ({ value }) =>
-                    value.length >= 20 ? `${value.slice(0, 20)}...` : value,
+                    value.length >= 20
+                      ? `${moment(value.slice(0, 20)).format("llll")}...`
+                      : moment(value).format("llll"),
                 };
               }
               if (key === "comment") {
@@ -102,6 +143,13 @@ export function Products({ data, dropdown, action, color }) {
                 return {
                   Header: "Purpose",
                   accessor: key,
+                };
+              }
+              if (key === "isCompliant") {
+                return {
+                  Header: "",
+                  accessor: key,
+                  Cell: ({ value }) => value && <p className=""></p>,
                 };
               }
               if (key === "fileUrl") {
@@ -147,7 +195,6 @@ export function Products({ data, dropdown, action, color }) {
   const tableHooks = (hooks) => {
     hooks.visibleColumns.push((columns) => [...columns]);
   };
-
   const tableInstance = useTable(
     {
       columns: productsColumns,
@@ -162,7 +209,11 @@ export function Products({ data, dropdown, action, color }) {
     tableInstance;
 
   useEffect(() => {
-    setProducts(data);
+    if (data?.length > 0) {
+      setProducts(data);
+    } else {
+      setProducts([]);
+    }
   }, [data]);
 
   const isEven = (idx) => idx % 2 === 0;
@@ -175,21 +226,23 @@ export function Products({ data, dropdown, action, color }) {
         >
           <thead className="capitalize border-spacing-3 border-secondary">
             {headerGroups?.map((headerGroup, index) => (
-              <tr key={index} {...headerGroup.getHeaderGroupProps()}>
+              <tr key={index} {...headerGroup?.getHeaderGroupProps()}>
                 {pathname === "/dashboard/contact" && (
                   <th className="text-sm  text-secondary"></th>
                 )}
-                {headerGroup.headers.map((column, index) => (
+                {headerGroup?.headers?.map((column, index) => (
                   <>
                     <th
                       key={index}
                       className="text-sm py-1 px-3 lg:py-2 lg:px-5 capitalize text-[#656565] font-normal"
-                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                      {...column?.getHeaderProps(
+                        column?.getSortByToggleProps()
+                      )}
                     >
                       <p className="flex items-center space-x-2">
-                        {column.render("Header")}
-                        {column.isSorted ? (
-                          column.isSortedDesc ? (
+                        {column?.render("Header")}
+                        {column?.isSorted ? (
+                          column?.isSortedDesc ? (
                             <ArrowDown />
                           ) : (
                             <ArrowUp />
@@ -201,7 +254,7 @@ export function Products({ data, dropdown, action, color }) {
                     </th>
                   </>
                 ))}
-                <th className="text-sm  text-secondary">
+                <th className="font-medium text-sm text-[#656565]">
                   {dropdown?.length > 0 ? "Action" : ""}
                 </th>
               </tr>
@@ -214,14 +267,14 @@ export function Products({ data, dropdown, action, color }) {
               return (
                 <tr
                   key={idx}
-                  {...row.getRowProps()}
+                  {...row?.getRowProps()}
                   className={`  border-y-[1px]  ${
                     isEven(idx) ? "  text-xs" : " text-xs"
                   }`}
                 >
                   {pathname === "/dashboard/contact" && (
                     <td className="flex items-center justify-center">
-                      <p className="cursor-pointer size-5 bg-[#91EE91] rounded mt-5" />
+                      <p />
                     </td>
                   )}
                   {row?.cells?.map((cell, idx) => (
@@ -229,29 +282,27 @@ export function Products({ data, dropdown, action, color }) {
                       <td
                         key={idx}
                         className={classNames("text-xs px-3 py-1 lg:px-5", {
-                          "bg-[#FF8F00]  text-white rounded-full flex items-center justify-center mt-2 w-[80px] lg:w-[100px] p-1":
-                            cell.value === "Pending",
-                          "bg-green-500  text-white rounded-full flex items-center justify-center mt-2 w-[80px] lg:w-[100px] p-1":
-                            cell.value === "Approved",
-                          "bg-[#FF170A]  text-white rounded-full flex items-center justify-center mt-2 w-[80px] lg:w-[100px] p-1":
-                            cell.value === "Rejected",
-                          "bg-[#376BDB] text-white rounded-full flex items-center justify-center mt-2 w-[80px] lg:w-[100px] p-1":
-                            cell.value === "Rework",
+                          "bg-green-500  text-white rounded flex items-center justify-center mt-2 h-[25px] w-[10px] p-3":
+                            cell.value === true,
+                          "bg-[#FF170A]  text-white rounded flex items-center justify-center mt-2 h-[25px] w-[10px] p-3":
+                            cell.value === false,
                         })}
-                        {...cell.getCellProps()}
+                        {...cell?.getCellProps()}
                       >
-                        {cell.render("Cell")}
+                        {cell?.render("Cell")}
                       </td>
                     </>
                   ))}
-                  <td className="cursor-pointer">
-                    {dropdown?.length > 0 ? (
+                  {dropdown?.length > 0 ? (
+                    <td className="cursor-pointer w-0">
                       <Dropdown
                         title={<SquareIcon />}
                         subtitle={dropdown}
-                        data={row.original}
+                        data={row?.original}
                       />
-                    ) : (
+                    </td>
+                  ) : (
+                    <td className="cursor-pointer">
                       <Dropdown
                         title={
                           <span
@@ -268,10 +319,10 @@ export function Products({ data, dropdown, action, color }) {
                         }
                         action={action}
                         // subtitle={['']}
-                        data={row.original}
+                        data={row?.original}
                       />
-                    )}
-                  </td>
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -281,3 +332,27 @@ export function Products({ data, dropdown, action, color }) {
     </>
   );
 }
+
+ export function extractTime(isoString) {
+    const date = new Date(isoString);
+
+    // Format: HH:MM:SS
+    const time24 = date.toTimeString().split(" ")[0];
+
+    // Format: HH:MM:SS.mmm
+    const timeWithMs = date.toISOString().split("T")[1].slice(0, -1);
+
+    // Format: hh:MM:SS AM/PM
+    const time12 = date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    });
+
+    return {
+      time24,
+      timeWithMs,
+      time12,
+    };
+  }

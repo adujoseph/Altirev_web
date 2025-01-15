@@ -91,13 +91,14 @@ export interface ResultType {
   id: string;
   title: string;
   userAltirevId: string;
-  counts: string | number | null;
+  counts: string | number | null | {};
   electionType: string;
   accreditedVoters: string | number;
   status: string;
   fileUrl: string | null;
   videoUrl: string | null;
   audioUrl: string | null;
+  invalidVotes: string | number;
   voteCasted: string | number;
   createdAt: string;
   updatedAt: string;

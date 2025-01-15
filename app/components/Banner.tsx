@@ -9,7 +9,7 @@ export default function Banner() {
       <section className="flex items-center justify-center">
         <div className="flex flex-col space-y-5 mx-auto items-center justify-center absolute top-1/4 text-white">
           <h1 className="text-center text-4xl sm:text-6xl font-bold">
-            Welcome to ............ <br />
+            Welcome to Altirev <br />
             Election Monitoring Platform
           </h1>
           <p className="text-center sm:w-3/4 sm:text-xl text-[#CDCDCD]">

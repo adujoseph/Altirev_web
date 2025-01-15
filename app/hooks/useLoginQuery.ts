@@ -59,10 +59,10 @@ export const useLoginQuery = () => {
     // Prefetch the dashboard page
     navigate.prefetch("/dashboard");
   }, [navigate]);
+
   const { mutate } = useMutation({
     mutationFn: () => postApi(`v1/auth/login`, payload),
     onSuccess: (data) => {
-      console.log("data", data);
       if (data?.token) {
         Toast({ title: "Login Successful", error: false });
         dispatch(login(data?.user));
@@ -87,7 +87,7 @@ export const useLoginQuery = () => {
       setSubmitting(false);
     },
     onError: (error) => {
-      console.log("there was an error", error);
+      console.error("there was an error", error);
     },
   });
   const getOtp = async () => {

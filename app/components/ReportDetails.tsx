@@ -1,31 +1,41 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { ApprovedImg, ArrowView, BackArrow, RejectedImg } from "../icons/Arrow";
-import { PollingDetails } from "./PollingDetails";
 import Card from "./Card";
-import { AudioIcon } from "../icons/Close";
 import UserDetails from "./UserDetails";
 import { Approve } from "./Approve";
 import { Reject } from "./Reject";
 import "video-react/dist/video-react.css";
 import { Player } from "video-react";
 import { useRouter } from "next/navigation";
-import { LiveAudioVisualizer, AudioVisualizer } from "react-audio-visualize";
 import { Escalate } from "./Escalate";
-import useReport from "../hooks/useReport";
-import { ReportType } from "../typings";
+import { ReportType, User } from "../typings";
 import Loading from "../loading";
+import { useAppSelector } from "../redux/hook";
+import { extractTime } from "./table";
 
 interface Props {
   setEdit: (e: boolean) => boolean;
   userDetails: any;
   details: ReportType;
+  sendReport: () => void;
+  loading: boolean;
+  setComment: (e?: any) => void;
+  setSuccess: (e?: any) => void;
+  comment: string;
+  success: boolean;
 }
 
 export default function ReportDetails({
   setEdit,
-  userDetails,
   details,
+  sendReport,
+  loading,
+  setComment,
+  comment,
+  userDetails,
+  success,
+  setSuccess,
 }: Props) {
   const [modal3, setModal3] = useState(false);
   const [modal, setModal] = useState(false);
@@ -34,12 +44,8 @@ export default function ReportDetails({
   const handleModal2 = () => setModal2((prev) => !prev);
   const handleModal = () => setModal((prev) => !prev);
   const handleModal3 = () => setModal3((prev) => !prev);
-  const [mediaRecorder, setMediaRecorder] = useState(details?.audioUrl ?? "");
-  const [blob, setBlob] = useState<Blob>();
-  const visualizerRef = useRef<HTMLCanvasElement>(null);
   const navigate = useRouter();
-      // const sanitizedHTML = DOMPurify.sanitize('');
-
+  const user: User = useAppSelector((state) => state?.user?.user);
   const back = () => {
     navigate.push("/dashboard/report");
     setEdit(false);
@@ -49,43 +55,71 @@ export default function ReportDetails({
     // Prefetch the dashboard page
     navigate.prefetch("/dashboard/report");
   }, [navigate]);
+  const audioRef: any = useRef(null);
+
+  const handleTimeUpdate = () => {
+    audioRef.current.currentTime;
+  };
+
+  function isValidURL(string: string) {
+    const urlPattern = new RegExp(
+      "^(https?:\\/\\/)?" + // protocol
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+        "(\\#[-a-z\\d_]*)?$",
+      "i"
+    ); // fragment locator
+    return !!urlPattern.test(string);
+  }
+  const result = details?.createdAt && extractTime(details?.createdAt);
+  const changeReportstatus = () => {
+    if (details?.status === "pending") sendReport("processing");
+    setSuccess(false);
+
+    return;
+  };
+
+  useEffect(() => {
+    user?.role === "comms" ? changeReportstatus() : () => {};
+  }, [details?.status, user?.role]);
   return (
     <>
       {modal && (
         <UserDetails
           data={userDetails}
           modal={modal}
-          
           handleModal={handleModal}
         />
       )}
       {modal2 && (
         <Approve
-          editData={null}
-          loading={false}
+          loading={loading}
           modal={modal2}
           handleModal={handleModal2}
-          handleSubmit={() => {}}
+          handleSubmit={() => sendReport("approved")}
+          success={success}
         />
       )}
       {modal3 && (
         <Reject
-          editData={null}
-          loading={false}
           modal={modal3}
           handleModal={handleModal3}
-          handleSubmit={() => {}}
-          setComment={() => {}}
-          sanitizedHTML={''}
+          handleSubmit={() => sendReport("rejected")}
+          setComment={setComment}
+          comment={comment}
+          success={success}
+          loading={loading}
         />
       )}
       {escalate && (
         <Escalate
-          editData={null}
-          loading={false}
+          loading={loading}
           modal={escalate}
+          success={success}
           handleModal={handleEscalateModal}
-          handleSubmit={() => {}}
+          handleSubmit={() => sendReport("escalated")}
         />
       )}
       <span
@@ -102,19 +136,22 @@ export default function ReportDetails({
           <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="">
               <h2 className="text-xl font-bold capitalize">
-                {details?.title} Polling Unit
+                {details?.pollingUnit?.toLowerCase()} Polling Unit
               </h2>
               <p className="text-[#272727] text-sm">
                 {details?.createdAt &&
                   new Date(details?.createdAt)?.toDateString()}
+                / {result?.time12}
               </p>
             </div>
-            <h2
-              onClick={handleEscalateModal}
-              className="bg-[#272727] cursor-pointer text-white rounded w-max py-2 px-7"
-            >
-              Escalate to Moderator
-            </h2>
+            {details?.status !== "escalated" && user.role !== "moderator" && (
+              <h2
+                onClick={handleEscalateModal}
+                className="bg-[#272727] cursor-pointer text-white rounded w-max py-2 px-7"
+              >
+                Escalate to Moderator
+              </h2>
+            )}
           </div>
 
           <hr className="my-5 bg-[#CBCBCB]" />
@@ -125,7 +162,7 @@ export default function ReportDetails({
                   <span className="my-2">
                     <h2 className="font-semibold mt-4">Video File of Report</h2>
 
-                    {details?.videoUrl ? (
+                    {isValidURL(details?.videoUrl) ? (
                       <>
                         <p className="text-sm">
                           This video shows the evidence of the incident.
@@ -146,14 +183,14 @@ export default function ReportDetails({
                   <span className="my-2">
                     <h2 className="font-semibold">Audio Recording</h2>
 
-                    {details?.audioUrl ? (
+                    {isValidURL(details?.audioUrl) ? (
                       <>
                         <p className="text-sm">
                           Audio recording during the election.
                         </p>
                         <hr className="bg-black my-2 h-0.5" />
                         <div>
-                          {mediaRecorder && (
+                          {/* {mediaRecorder && (
                             <LiveAudioVisualizer
                               mediaRecorder={mediaRecorder}
                               width={200}
@@ -162,8 +199,8 @@ export default function ReportDetails({
                               gap={0}
                               barColor={"#f76565"}
                             />
-                          )}
-                          {blob && (
+                          )} */}
+                          {/* {blob && (
                             <AudioVisualizer
                               ref={visualizerRef}
                               blob={blob}
@@ -173,10 +210,17 @@ export default function ReportDetails({
                               gap={0}
                               barColor={"#f76565"}
                             />
-                          )}
+                          )} */}
                           {/* <p>
                     <AudioIcon />
                   </p> */}
+                          <audio
+                            controls
+                            ref={audioRef}
+                            className=""
+                            src={details.audioUrl} // Replace with your audio file path
+                            onTimeUpdate={handleTimeUpdate}
+                          />
                         </div>
                       </>
                     ) : (
@@ -206,7 +250,7 @@ export default function ReportDetails({
                   </span>
                 </div>
               </Card>
-              {details?.status === "pending" && (
+             {details?.status === "processing" && user?.role === "comms" && (
                 <Card>
                   <div className="flex items-center justify-center flex-col p-5 space-y-2">
                     <button
@@ -229,7 +273,7 @@ export default function ReportDetails({
                   <div className="p-5">
                     <h2 className="font-semibold"> Reason for Rejection</h2>
                     <hr className="bg-black my-2 h-0.5" />
-                    <p>Not detailed enough and the video part is missing</p>
+                    <p>{details?.reasons}</p>
                   </div>
                 </Card>
               )}
@@ -237,7 +281,9 @@ export default function ReportDetails({
                 <Card>
                   <div className="p-5 relative">
                     <p>{details?.status === "rejected" && <RejectedImg />}</p>
-                    <p className="bottom-3 right-3 absolute">Bolaji Raphael</p>
+                    <p className="bottom-3 right-3 absolute">
+                      {user?.firstName}
+                    </p>
                   </div>
                 </Card>
               )}
@@ -245,7 +291,9 @@ export default function ReportDetails({
                 <Card>
                   <div className="p-5 relative">
                     <p>{details?.status === "approved" && <ApprovedImg />}</p>
-                    <p className="bottom-3 right-3 absolute">Bolaji Raphael</p>
+                    <p className="bottom-3 right-3 absolute">
+                      {user?.firstName}
+                    </p>
                   </div>
                 </Card>
               )}

@@ -2,9 +2,11 @@
 import React from "react";
 import { DashboardAgent, DashboardHat } from "../icons/Dashboard";
 import useRole from "../hooks/useRole";
+import { User } from "../typings";
 
 export default function AdminCard({ setCategory, category }: any) {
-  const { user,active } = useRole();
+  const { allUser } = useRole();
+  const active = allUser.data?.filter((res: User) => res?.status === "active");
   return (
     <aside className="flex flex-col justify-center items-center sm:items-start sm:justify-start sm:grid sm:grid-cols-3 sm:gap-1 lg:gap-4">
       <div
@@ -56,7 +58,7 @@ export default function AdminCard({ setCategory, category }: any) {
             className="flex flex-col text-white"
           >
             <p>Total</p>
-            <h1 className="text-xl">{user?.data?.length ?? 0}</h1>
+            <h1 className="text-xl">{allUser?.data?.length ?? 0}</h1>
           </span>
           <span
             style={{
