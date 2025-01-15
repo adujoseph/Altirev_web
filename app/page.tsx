@@ -8,6 +8,7 @@ import Plans from "./components/Plans";
 import { GetStarted } from "./components/GetStarted";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
+import Tawk from "./components/Tawk";
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
       <GetStarted />
       <Contact />
       <Footer />
+      {/* <Tawk /> */}
     </main>
   );
 }

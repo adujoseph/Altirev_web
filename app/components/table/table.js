@@ -5,9 +5,9 @@ import ReactPaginate from "react-paginate";
 import PageSize from "./PageSize";
 import { Products } from "./index";
 
-const Paginate = ({ data, dropdown, action, color }) => {
+const Paginate = ({ data, dropdown, action, color, page_count }) => {
   const [pageNumber, setPageNumber] = useState(0);
-  const [pageCount, setPageCount] = useState(5);
+  const [pageCount, setPageCount] = useState(page_count ?? 5);
   const [displayitems, setDisplayItems] = useState([]);
   // const { open } = useStateContext();
   const pagesVisited = pageNumber * Number(pageCount);
@@ -67,7 +67,7 @@ const Paginate = ({ data, dropdown, action, color }) => {
           previousLinkClassName={"rounded-sm p-2"}
           nextLinkClassName={"rounded-sm p-2"}
           disabledClassName={""}
-          pageClassName={"text-[#1F2024]"}
+          pageClassName={"text-[#1F{new Date().getFullYear()}]"}
           activeClassName={
             "rounded-lg bg-[#F6F6F6] p-2 text-black font-semibold"
           }

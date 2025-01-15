@@ -5,11 +5,11 @@ interface Props {
   ward: string[];
   pollingUnit: string[];
   stateLga: string[];
-  setStateId: (e: React.FormEvent) => string;
+  setStateId: (e?: React.FormEvent) => string;
   stateId: string;
-  setStateLgaId: (e: React.FormEvent) => string;
-  setWardId: (e: React.FormEvent) => string;
-  setPollingUnitId: (e: React.FormEvent) => string;
+  setStateLgaId: (e?: React.FormEvent) => string;
+  setWardId: (e?: React.FormEvent) => string;
+  setPollingUnitId: (e?: React.FormEvent) => string;
   stateLgaId: string;
   wardId: string;
   pollingUnitId: string;

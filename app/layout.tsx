@@ -6,8 +6,8 @@ import Provider from "./provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Election",
-  description: "Election",
+  title: "Altirev - Election Monitoring Solution",
+  description: "Altirev - Election Monitoring Solution App",
 };
 
 export default function RootLayout({
@@ -22,9 +22,11 @@ export default function RootLayout({
           rel="stylesheet"
           href=" https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
         />
+        
       </head>
       <body className="bg-[#f2f6fd]">
-        <Provider>{children}</Provider>
+        <Provider>
+          {children}</Provider>
       </body>
     </html>
   );

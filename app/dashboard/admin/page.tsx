@@ -1,11 +1,12 @@
 'use client'
 import AddUser from "@/app/components/AddUser";
 import { AdminSubTable1 } from "@/app/components/AdminTable";
+import useAuth from "@/app/components/Auth";
 import { useState } from "react";
 
 export default function page() {
   const [usersModal, setUsersModal] = useState(false);
-
+  const { user } = useAuth("admin");
   const handleUsersModal = () => setUsersModal((prev) => !prev);
 
   return (

@@ -8,7 +8,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <div>
         <Sidebar />
       </div>
-      <div className="">
+      <div className="min-h-screen">
         <DashboardWrapper>{children}</DashboardWrapper>
       </div>
     </div>

@@ -25,10 +25,10 @@ export default function AdminTable({ category }: string) {
   const handleUsersModal = () => setUsersModal((prev) => !prev);
   const handleTenantModal = () => setTenantModal((prev) => !prev);
   const { setEdit, edit, editData, table } = useStateContext();
-  const { user } = useRole();
+  const { allUserSearch, user, allUser, suspendUser, loadingUser } = useRole();
   const {
     setStatus,
-    election,
+    pastElection,
     status,
     values,
     errors,
@@ -80,7 +80,8 @@ export default function AdminTable({ category }: string) {
           editData={editData}
           handleModal={() => setEdit(false)}
           modal={edit}
-          user={user}
+          suspendUser={suspendUser}
+          loading={loadingUser}
         />
       )}
       {edit && table === "reassign" && (
@@ -92,18 +93,26 @@ export default function AdminTable({ category }: string) {
         />
       )}
       {edit && table === "profile" && (
-        <UserDetails data={editData} handleModal={() => setEdit(false)} modal={edit} />
+        <UserDetails
+          data={editData}
+          handleModal={() => setEdit(false)}
+          modal={edit}
+        />
       )}
       {category === "election" && (
         <AdminSubTable
           setStatus={setStatus}
           status={status}
-          election={election}
+          pastElection={pastElection}
           handleElectionModal={handleElectionModal}
         />
       )}
       {category === "users" && (
-        <AdminSubTable1 user={user} handleUsersModal={handleUsersModal} />
+        <AdminSubTable1
+          user={allUserSearch}
+          handleUsersModal={handleUsersModal}
+          loading={allUser.isLoading}
+        />
       )}
       {category === "tenants" && (
         <AdminSubTable2 handleTenantModal={handleTenantModal} />
@@ -111,10 +120,9 @@ export default function AdminTable({ category }: string) {
     </section>
   );
 }
-
 export const AdminSubTable = ({
   handleElectionModal,
-  election,
+  pastElection,
   status,
   setStatus,
 }: any) => (
@@ -166,14 +174,22 @@ export const AdminSubTable = ({
       </div>
     </aside>
     <div className="w-full overflow-auto my-3 scrollbar-thin scrollbar-track-gray-400/20 scrollbar-thumb-[#98989A] p-10">
-      {election.isLoading ? (
+      {pastElection.isLoading ? (
         <SkeletonTable />
-      ) : election?.data?.length > 0 ? (
+      ) : pastElection?.data?.upcoming?.length > 0 ||
+        pastElection?.data?.ongoing?.length > 0 ||
+        pastElection?.data?.previous?.length > 0 ? (
         <Paginate
           action="view user"
           color={"#272727"}
           dropdown={["Delete"]}
-          data={election?.data}
+          data={
+            status === "upcoming"
+              ? pastElection?.data?.upcoming
+              : status === "ongoing"
+              ? pastElection?.data?.ongoing
+              : pastElection?.data?.previous
+          }
         />
       ) : (
         <p className="text-[#98989A] text-xl text-center capitalize font-medium">
@@ -184,7 +200,7 @@ export const AdminSubTable = ({
   </Card>
 );
 
-export const AdminSubTable1 = ({ handleUsersModal, user }: any) => (
+export const AdminSubTable1 = ({ handleUsersModal, user, loading }: any) => (
   <Card>
     <aside className="flex items-center justify-between p-5">
       <div>
@@ -214,14 +230,14 @@ export const AdminSubTable1 = ({ handleUsersModal, user }: any) => (
       </div>
     </aside>
     <div className="w-full overflow-auto my-3 scrollbar-thin scrollbar-track-gray-400/20 scrollbar-thumb-[#98989A] p-10">
-      {user?.isLoading ? (
+      {loading ? (
         <SkeletonTable />
-      ) : 3 > 0 ? (
+      ) : user?.length > 0 ? (
         <Paginate
           action="view user"
           color={"#272727"}
           dropdown={["Suspend", "Reassign Role", "View Contact"]}
-          data={user?.data}
+          data={user}
         />
       ) : (
         <p className="text-[#98989A] text-xl text-center capitalize font-medium">
@@ -264,7 +280,7 @@ export const AdminSubTable2 = ({ handleTenantModal }: any) => (
     <div className="w-full overflow-auto my-3 scrollbar-thin scrollbar-track-gray-400/20 scrollbar-thumb-[#98989A] p-10">
       {false ? (
         <SkeletonTable />
-      ) : 3 > 0 ? (
+      ) : testApi.length > 0 ? (
         <Paginate
           action="view user"
           color={"#272727"}

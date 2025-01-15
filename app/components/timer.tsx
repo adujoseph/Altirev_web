@@ -3,12 +3,11 @@ import bg from "@/app/imgs/dash.png";
 import Image from "next/image";
 import { BackArrow } from "../icons/Arrow";
 
-const Countdown = ({ targetDate, handleShow }: any) => {
+const Countdown = ({handleShow, details }: any) => {
   const calculateTimeLeft = () => {
-    const difference = +new Date(targetDate) - +new Date();
+    const difference = +new Date(details?.electionDate) - +new Date();
     let timeLeft = {};
-
-    if (difference > 0) {
+    if (difference) {
       timeLeft = {
         days: Math.floor(difference / (1000 * 60 * 60 * 24)),
         hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
@@ -16,7 +15,6 @@ const Countdown = ({ targetDate, handleShow }: any) => {
         seconds: Math.floor((difference / 1000) % 60),
       };
     }
-
     return timeLeft;
   };
 
@@ -42,7 +40,6 @@ const Countdown = ({ targetDate, handleShow }: any) => {
       </span>
     );
   });
-
   return (
     <div>
       {timerComponents.length ? (
@@ -92,10 +89,10 @@ const Countdown = ({ targetDate, handleShow }: any) => {
             </div>
           </article>
           <div className="flex items-center justify-center flex-col my-5">
-            <h2 className="text-[#272727] font-semibold">
-              Nigeria Presidential Election{" "}
-            </h2>
-            <p className="text-xs font-semibold">28th of Feburary, 2024</p>
+            <h2 className="text-[#272727] font-semibold">{details?.name}</h2>
+            <p className="text-xs font-semibold">
+              {new Date(details?.electionDate)?.toDateString()}
+            </p>
           </div>
         </>
       ) : (

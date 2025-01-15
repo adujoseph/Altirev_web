@@ -4,7 +4,7 @@ import ModalCard from "./modal/Modal";
 import Button from "./Button";
 import Input from "./Input";
 interface Props {
-  handleModal: () => boolean;
+  handleModal: () => void;
   modal: boolean;
 }
 export default function AddUser({ handleModal, modal }: Props) {

@@ -1,3 +1,4 @@
+import React from 'react';
 import Button from './Button'
 import ModalCard from './modal/Modal'
 
@@ -5,20 +6,24 @@ interface RejectProps {
   modal: boolean;
   handleModal: () => void;
   setComment: () => void;
-  editData: any;
   handleSubmit: (e: any, t?: any) => void;
   loading: boolean;
+  success: boolean;
+  comment: string;
 }
 export const Reject = ({
   modal,
   handleModal,
   handleSubmit,
-  editData,
   loading,
   setComment,
+  comment,success
 }: RejectProps): JSX.Element => (
   <>
     <ModalCard setOpen={handleModal} open={modal}>
+          {success ? (
+        <SuccessMessage handleModal={handleModal} />
+      ) : (
       <div>
         <h2 className="font-semibold text-xl">Reject Request</h2>
         <p className="text-sm text-center mt-6">
@@ -32,12 +37,11 @@ export const Reject = ({
           <textarea
             name="comment"
             placeholder="comment"
-            // dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
             // onBlur={handleBlur}
             onChange={(e) => setComment(e.target.value)}
             className={`p-2 rounded resize-none outline-none ${
-              editData?.comment
-                ? "border-2 border-green-500"
+              comment
+                ? "border-2 border-blue-500"
                 : "border-[1px] border-gray-300 text-sm"
             }`}
           ></textarea>
@@ -50,13 +54,27 @@ export const Reject = ({
             loading={false}
           />
           <Button
-            onClick={() => handleSubmit(editData, "reject")}
+            onClick={() => handleSubmit(false)}
             label="Reject"
             styles="bg-[#FF3B30] rounded-lg mx-auto mt-4"
             loading={loading}
           />
         </div>
-      </div>
+      </div>)}
     </ModalCard>
   </>
+);
+
+export const SuccessMessage = ({ handleModal }: { handleModal: () => void }) => (
+  <div className="flex items-center flex-col space-y-4 justify-center ">
+    <h2 className=" mt-10 w-2/3 capitalize text-xl font-bold text-center text-[#2550C0]">
+      Election Report rejected successfully!
+    </h2>
+    <Button
+      onClick={handleModal}
+      label="Done"
+      styles="bg-[#2550C0] rounded mx-auto mt-4 w-full"
+      loading={false}
+    />
+  </div>
 );

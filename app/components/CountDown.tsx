@@ -13,12 +13,16 @@ export const CountDown = ({ handleShow }: any) => (
         COUNT DOWN
       </h2>
       <Image src={bg} className="w-full sm:w-2/3" alt="" />
-      <Countdown targetDate={"December 31, 2024 10:00:00"} />
+      <Countdown
+        targetDate={"December 31, {new Date().getFullYear()} 10:00:00"}
+      />
       <span>
         <h2 className="mt-5 text-xl font-semibold text-center text-[#272727]">
           Nigeria Presidential Election{" "}
         </h2>
-        <p className="text-center text-[#272727]">28th of Feburary, 2024</p>
+        <p className="text-center text-[#272727]">
+          28th of Feburary, {new Date().getFullYear()}
+        </p>
       </span>
     </article>
   </div>

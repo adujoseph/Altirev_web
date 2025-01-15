@@ -4,35 +4,28 @@ import ModalCard from "./modal/Modal";
 import Button from "./Button";
 import useReport from "../hooks/useReport";
 
-export default function SendReport({ handleModal, modal }: any) {
-  const [category, setCategory] = useState("normal");
-  const [comment, setComment] = useState("");
+export default function SendReport({
+  handleModal,
+  modal,
+  loading,
+  sendReport,
+  comment,
+  setReportStatus,
+  category,
+  setComment,
+}: any) {
   const [view, setView] = useState(1);
-
-  const {
-    states,
-    stateLga,
-    setStateId,
-    stateId,
-    setStateLgaId,
-    stateLgaId,
-    wardId,
-    ward,
-    pollingUnit,
-    pollingUnitId,
-    setPollingUnitId,
-    setWardId,
-  } = useReport("");
-
+const statusArr = ['pending', 'approved', 'rejected', 'escalated'];
   return (
     <ModalCard setOpen={handleModal} open={modal}>
       {view === 1 && (
         <>
-          <h2 className="font-bold mb-4 text-xl">Report</h2>
+          <h2 className="font-bold mb-4 text-xl">Change Report Status</h2>
+
           <hr className=" my-2 h-0.5" />
 
           <aside className="flex flex-col">
-            <div className=" flex items-center justify-between">
+            {/* <div className=" flex items-center justify-between">
               <div className="font-semibold capitalize flex flex-col space-y-1 w-full sm:w-1/2">
                 <label htmlFor="state" className="text-sm font-medium">
                   state
@@ -122,14 +115,14 @@ export default function SendReport({ handleModal, modal }: any) {
                   ))}
                 </select>
               </div>
-            </div>
-            <div className="font-semibold capitalize flex flex-col space-y-1 my-2">
+            </div> */}
+            {/* <div className="font-semibold capitalize flex flex-col space-y-1 my-2">
               <label htmlFor="commentP" className="text-sm font-medium">
                 Comment Priority
               </label>
               <div className="flex items-center justify-center sm:justify-start">
                 <div
-                  onClick={() => setCategory("normal")}
+                  onClick={() => setReportStatus("normal")}
                   className={
                     category === "normal"
                       ? "font-semibold rounded text-white p-2 flex items-center justify-center text-center text-sm bg-[#272727] w-1/2"
@@ -139,7 +132,7 @@ export default function SendReport({ handleModal, modal }: any) {
                   <p className="text-sm sm:text-base">Normal Status </p>
                 </div>
                 <div
-                  onClick={() => setCategory("high")}
+                  onClick={() => setReportStatus("high")}
                   className={
                     category === "high"
                       ? "font-semibold rounded text-white p-2 flex items-center justify-center text-center text-sm bg-[#FF0000] w-1/2"
@@ -149,8 +142,32 @@ export default function SendReport({ handleModal, modal }: any) {
                   <p className="text-sm sm:text-base">High Status</p>
                 </div>
               </div>
-            </div>
+            </div> */}
+            <div className="font-semibold capitalize flex flex-col space-y-1 w-full">
+              <label htmlFor="state" className="text-sm font-medium">
+                status
+              </label>
+              <select
+                className={`p-2 outline-none rounded w-full capitalizedash ${
+                  category
+                    ? "border-[1px] border-[#2550C0] bg-[#EDF6FF]"
+                    : "border-[1px] border-gray-300 text-sm text-[#979797]"
+                }`}
+                onChange={(e: React.FormEvent) =>
+                  setReportStatus(e.target.value)
+                }
 
+                value={category}
+                name="status"
+              >
+                <option value="">select status</option>
+                {statusArr.map((item: string) => (
+                  <option className="capitalize" key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="flex flex-col space-y-2">
               <div className="font-semibold capitalize flex flex-col space-y-1 my-2">
                 <label htmlFor="comment" className="text-sm font-medium">
@@ -171,10 +188,10 @@ export default function SendReport({ handleModal, modal }: any) {
               </div>
             </div>
             <Button
-              onClick={() => setView(2)}
+              onClick={sendReport}
               label="Send"
               styles="bg-[#2550C0] w-full rounded mx-auto mt-4"
-              //   loading={loading}
+              loading={loading}
             />
           </aside>
         </>

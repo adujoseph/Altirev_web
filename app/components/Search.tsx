@@ -16,7 +16,7 @@ export function SearchField({
 }: Props) {
   return (
     <div
-      className={`w-[240px] md:w-[330px] xl:w-[350px] h-[43px] flex items-center space-x-3 pl-5 border-[1px] bg-transparent border-[#CBCBCB] rounded-xl overflow-hidden ${style}`}
+      className={`w-[240px] xl:w-[350px] h-[43px] flex items-center space-x-3  pl-5 border-[1px] bg-transparent border-[#CBCBCB] rounded-xl overflow-hidden ${style}`}
     >
       <Search />
       <input

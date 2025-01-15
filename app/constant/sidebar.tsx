@@ -1,5 +1,6 @@
 import { Contact, Home, LiveFeed, Notification, Report, Result, Role } from "../icons/Sidebar";
 
+// regular
 export const list = [
   {
     title: "Home",
@@ -20,6 +21,8 @@ export const list = [
     icon2: <LiveFeed color="#2550C0" />,
   },
 ];
+// admin menu
+
 export const list4 = [
   {
     title: "Home",
@@ -28,6 +31,8 @@ export const list4 = [
     icon2: <Home color="#2550C0" />,
   },
 ];
+// super admin menu
+
 export const list5 = [
   {
     title: "Home",
@@ -48,6 +53,7 @@ export const list5 = [
     icon2: <Result color="#2550C0" />,
   },
 ];
+// moderator menu
 export const list3 = [
   {
     title: "Home",
@@ -80,6 +86,8 @@ export const list3 = [
     icon2: <Role color="#2550C0" />,
   },
 ];
+// comms menu
+
 export const list2 = [
   {
     title: "Home",
