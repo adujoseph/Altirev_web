@@ -55,7 +55,6 @@ export default function useReport(id: string) {
   const fetchPendingReport = async () => {
     try {
       const resp = await getTenantReports(user.tenantId);
-
       const results: any = [];
       resp?.length > 0 &&
         resp?.forEach((item: any) => {

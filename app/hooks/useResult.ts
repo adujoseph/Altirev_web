@@ -214,7 +214,6 @@ export default function useResult(id: string) {
     refetchInterval: 120000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },
@@ -231,7 +230,6 @@ export default function useResult(id: string) {
     refetchInterval: 120000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },
@@ -248,7 +246,6 @@ export default function useResult(id: string) {
     refetchInterval: 120000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },
