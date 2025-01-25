@@ -96,8 +96,8 @@ export default function page() {
   useEffect(() => {
     agentId && totalPayment();
   }, [agentId]);
-  // const publicKey = process.env.REACT_APP_PAYSTACK_PUBLIC_KEY;
-  const publicKey = "pk_test_3d88065c4d72f0a1f435ca677609ad0da70fc33b";
+  const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_URL;
+  // const publicKey = "pk_test_3d88065c4d72f0a1f435ca677609ad0da70fc33b";
   // const publicKey = "pk_live_71ce197a14d1f8f768a455308a8a2be87f6bc434";
   // const publicKey = "pk_test_3eb5e531d4ed919aaf3d459a8490e4e9eac550cb";
   const componentProps = {

@@ -167,16 +167,6 @@ const ReportHeader = ({
           >
             <p className="text-base">New </p>
           </div>
-          <div
-            onClick={() => setCategory("processing")}
-            className={
-              category === "processing"
-                ? "font-semibold text-[#2550C0] flex items-center space-x-3 justify-center text-center text-sm border-b-2 border-[#2550C0] sm:w-[120px]"
-                : "text-[#CBCBCB] flex items-center space-x-3 justify-center cursor-pointer text-center text-sm border-b-2 border-[#CBCBCB] w-[120px]"
-            }
-          >
-            <p className="text-base">Processing </p>
-          </div>
         </>
       )}
       <div

@@ -55,7 +55,6 @@ export default function useReport(id: string) {
   const fetchPendingReport = async () => {
     try {
       const resp = await getTenantReports(user.tenantId);
-   
       const results: any = [];
       resp?.length > 0 &&
         resp?.forEach((item: any) => {
@@ -69,28 +68,10 @@ export default function useReport(id: string) {
             createdAt: `${item?.createdAt}`,
           });
         });
-      return results?.filter((i: any) => i?.status === "pending");
-    } catch (error) {
-      console.error("Er", error);
-    }
-  };
-  const fetchProcessingReport = async () => {
-    try {
-      const resp = await getTenantReports(user.tenantId);
-      const results: any = [];
-      resp?.length > 0 &&
-        resp?.forEach((item: any) => {
-          results.push({
-            state: `${item?.state}`,
-            LGA: `${item?.lga}`,
-            ward: `${item?.ward}`,
-            PU: `${item?.pollingUnit}`,
-            status: `${item?.status}`,
-            id: `${item?.id}`,
-            createdAt: `${item?.createdAt}`,
-          });
-        });
-      return results?.filter((i: any) => i?.status === "processing");
+      const total = results
+        ?.filter((i: any) => i?.status === "pending")
+        ?.concat(results?.filter((i: any) => i?.status === "processing"));
+      return total;
     } catch (error) {
       console.error("Er", error);
     }
@@ -161,7 +142,7 @@ export default function useReport(id: string) {
   const fetchReportById = async () => {
     try {
       const resp = await getSingleReports(resultID);
-  
+
       return resp;
     } catch (error) {
       console.error("Er", error);
@@ -199,22 +180,7 @@ export default function useReport(id: string) {
     },
     onError: (error: any) => console.error(error),
   });
-  const processingReport = useQuery({
-    queryKey: ["processingReport"],
-    queryFn: fetchProcessingReport,
-    refetchOnReconnect: true,
-    retry: 5,
-    retryDelay: 100,
-    staleTime: 2000,
-    refetchOnMount: true,
-    refetchInterval: 12000, // 2 minutes
-    refetchIntervalInBackground: true,
-    placeholderData: keepPreviousData,
-    onSuccess(data: any) {
-      //   Toast({ title: "page refreshed", error: false });
-    },
-    onError: (error: any) => console.error(error),
-  });
+
   const pendingReport = useQuery({
     queryKey: ["pendingReport"],
     queryFn: fetchPendingReport,
@@ -270,8 +236,6 @@ export default function useReport(id: string) {
       ? pendingReport
       : category === "approved"
       ? approvedReport
-      : category === "processing"
-      ? processingReport
       : escalatedReport;
 
   const total_report = report?.data?.concat(results);

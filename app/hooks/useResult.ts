@@ -16,7 +16,9 @@ export default function useResult(id: string) {
   const [tags, setTags] = useState("");
   const [modal, setModal] = useState(false);
   const user: User = useAppSelector((state) => state?.user?.user);
-  const [category, setCategory] = useState(user?.role === 'comms' ? "pending":'approved');
+  const [category, setCategory] = useState(
+    user?.role === "comms" ? "pending" : "approved"
+  );
   const handleModal = () => setModal((prev) => !prev);
   const [userDetails, setUserDetails] = useState<User>();
   const resultID = editData?.id ?? id;
@@ -57,31 +59,13 @@ export default function useResult(id: string) {
             PU: `${item?.electionLocation?.pollingUnit?.pollingUnit}`,
             status: `${item?.status}`,
             id: `${item?.id}`,
-            createdAt:`${item?.createdAt}`
+            createdAt: `${item?.createdAt}`,
           });
         });
-      return results?.filter((i: any) => i?.status === "pending");
-    } catch (error) {
-      console.error("Er", error);
-    }
-  };
-  const fetchProcessingResult = async () => {
-    try {
-      const resp = await getTenantResult(user.tenantId);
-      const results: any = [];
-      resp?.length > 0 &&
-        resp?.forEach((item: any) => {
-          results.push({
-            state: `${item?.electionLocation?.state?.stateName}`,
-            LGA: `${item?.electionLocation?.lga?.lgaName}`,
-            ward: `${item?.electionLocation?.ward?.wardName}`,
-            PU: `${item?.electionLocation?.pollingUnit?.pollingUnit}`,
-            status: `${item?.status}`,
-            id: `${item?.id}`,
-            createdAt:`${item?.createdAt}`
-          });
-        });
-      return results?.filter((i: any) => i?.status === "processing");
+      const total = results
+        ?.filter((i: any) => i?.status === "pending")
+        ?.concat(results?.filter((i: any) => i?.status === "processing"));
+      return total;
     } catch (error) {
       console.error("Er", error);
     }
@@ -99,7 +83,7 @@ export default function useResult(id: string) {
             PU: `${item?.electionLocation?.pollingUnit?.pollingUnit}`,
             status: `${item?.status}`,
             id: `${item?.id}`,
-            createdAt:`${item?.createdAt}`
+            createdAt: `${item?.createdAt}`,
           });
           // setAllResults(results);
         });
@@ -121,7 +105,7 @@ export default function useResult(id: string) {
             PU: `${item?.electionLocation?.pollingUnit?.pollingUnit}`,
             status: `${item?.status}`,
             id: `${item?.id}`,
-            createdAt:`${item?.createdAt}`
+            createdAt: `${item?.createdAt}`,
           });
           // setAllResults(results);
         });
@@ -146,21 +130,6 @@ export default function useResult(id: string) {
     },
     onError: (error: any) => console.error(error),
   });
-  const processingResult = useQuery({
-    queryKey: ["processingResult"],
-    queryFn: fetchProcessingResult,
-    refetchOnReconnect: true,
-    retry: 5,
-    retryDelay: 100,
-    staleTime: 5000,
-    refetchOnMount: true,
-    refetchInterval: 120000, // 2 minutes
-    refetchIntervalInBackground: true,
-    placeholderData: keepPreviousData,
-    onSuccess(data: any) {
-      //   Toast({ title: "page refreshed", error: false });
-    },
-    onError: (error: any) => console.error(error),  });
   const approvedResult = useQuery({
     queryKey: ["approvedResult"],
     queryFn: fetchApprovedResult,
@@ -175,7 +144,8 @@ export default function useResult(id: string) {
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },
-    onError: (error: any) => console.error(error),  });
+    onError: (error: any) => console.error(error),
+  });
   const rejectedResult = useQuery({
     queryKey: ["rejectedResult"],
     queryFn: fetchRejectedResult,
@@ -190,7 +160,8 @@ export default function useResult(id: string) {
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },
-    onError: (error: any) => console.error(error),  });
+    onError: (error: any) => console.error(error),
+  });
   const fetchFilteredStateResult = async () => {
     try {
       const resp = await getApi(`v1/results/public/${countryId}/states`);
@@ -243,11 +214,11 @@ export default function useResult(id: string) {
     refetchInterval: 120000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },
-    onError: (error: any) => console.error(error),  });
+    onError: (error: any) => console.error(error),
+  });
   const resultFilter = useQuery({
     queryKey: ["resultFilter", stateLgaId],
     queryFn: fetchFilteredWardResult,
@@ -259,11 +230,11 @@ export default function useResult(id: string) {
     refetchInterval: 120000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },
-    onError: (error: any) => console.error(error),  });
+    onError: (error: any) => console.error(error),
+  });
   const localFilter = useQuery({
     queryKey: ["resultFilterl", stateId],
     queryFn: fetchFilteredLocalResult,
@@ -275,11 +246,11 @@ export default function useResult(id: string) {
     refetchInterval: 120000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-
     onSuccess(data: any) {
       //   Toast({ title: "page refreshed", error: false });
     },
-    onError: (error: any) => console.error(error),  });
+    onError: (error: any) => console.error(error),
+  });
   const pollingFilter = useQuery({
     queryKey: ["resultFilterp", wardId],
     queryFn: fetchFilteredPollingResult,
@@ -318,8 +289,6 @@ export default function useResult(id: string) {
       ? rejectedResult
       : category === "pending"
       ? pendingResult
-      : category === "processing"
-      ? processingResult
       : approvedResult;
 
   const resultSearch = useMemo(
@@ -376,7 +345,8 @@ export default function useResult(id: string) {
   };
 
   return {
-    inputText,setUserDetails,
+    inputText,
+    setUserDetails,
     tags,
     setTags,
     resultByID,
