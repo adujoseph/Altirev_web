@@ -15,21 +15,23 @@ export default function page() {
   );
 }
 
-export const Hurray = () => (
-  <>
-    <span className="flex items-center justify-center">
-      <Success />
-    </span>
+export const Hurray = () => {
+  return (
+    <>
+      <span className="flex items-center justify-center">
+        <Success />
+      </span>
 
-    <h2 className="font-bold text-2xl mx-auto w-full text-center text-[#2550C0]">
-      Your password has been reset. 🎉
-    </h2>
-    <Link
-      prefetch
-      href="/login"
-      className="flex items-center mx-auto capitalize my-5 justify-center rounded-lg p-2 w-max bg-[#2550C0] text-white "
-    >
-      go to login
-    </Link>
-  </>
-);
+      <h2 className="font-bold text-2xl mx-auto w-full text-center text-[#2550C0]">
+        Your password has been reset. 🎉
+      </h2>
+      <Link
+        prefetch
+        href="/login"
+        className="flex items-center mx-auto capitalize my-5 justify-center rounded-lg p-2 w-max bg-[#2550C0] text-white "
+      >
+        go to login
+      </Link>
+    </>
+  );
+} 

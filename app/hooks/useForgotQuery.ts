@@ -9,7 +9,7 @@ import { useState } from "react";
 // import { forgotSchema } from '../schema/login'
 import * as yup from "yup";
 
-export const useForgotQuery = (hash: string) => {
+export const useForgotQuery = (hash: string | null) => {
   const navigate = useRouter();
   const [modal, setModal] = useState(false);
   const [loading, setLoading] = useState(false);

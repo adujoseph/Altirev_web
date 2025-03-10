@@ -88,8 +88,8 @@ export default function page() {
                       onBlur={handleBlur}
                       value={values.password}
                     />
-                    {errors.password ? (
-                      <b className="text-xs text-red-500">{errors.password}</b>
+                    {errors?.password ? (
+                      <b className="text-xs text-red-500">{errors?.password}</b>
                     ) : null}
                     <Input
                       label="Confirm Password"
@@ -100,8 +100,8 @@ export default function page() {
                       onBlur={handleBlur}
                       value={values.cpassword}
                     />
-                    {errors.cpassword ? (
-                      <b className="text-xs text-red-500">{errors.cpassword}</b>
+                    {errors?.cpassword ? (
+                      <b className="text-xs text-red-500">{errors?.cpassword}</b>
                     ) : null}
                   </div>
                 </div>
