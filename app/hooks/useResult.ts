@@ -263,7 +263,6 @@ export default function useResult(id: string) {
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
     onSuccess(data: any) {
-      //   Toast({ title: "page refreshed", error: false });
     },
     onError: (error: any) => console.error(error),
   });
