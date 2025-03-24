@@ -17,7 +17,7 @@ export const useContactQuery = () => {
   const handleModal = () => setModal((prev) => !prev);
   const { edit, setEdit, editData } = useStateContext();
   const user: User = useAppSelector((state) => state?.user?.user);
-  const [userDetails, setUserDetails] = useState<User>();
+  const [userDetails, setUserDetails] = useState<any>();
 
   const defaultValue = {
     phone: "",
@@ -82,6 +82,7 @@ export const useContactQuery = () => {
   const fetchSingleContact = async () => {
     try {
       const res = await getSingleUser(editData?.altirevId);
+      console.log('res', res)
       setUserDetails({
         email: res?.email,
         username: res?.username,
@@ -104,23 +105,23 @@ export const useContactQuery = () => {
       console.error("Er", error);
     }
   };
-  const single_contact = useQuery({
-    queryKey: ["single_contact", editData],
-    queryFn: fetchSingleContact,
-    refetchOnReconnect: true,
-    retry: 5,
-    retryDelay: 100,
-    staleTime: 5000,
-    refetchOnMount: true,
-    refetchInterval: 120000, // 2 minutes
-    placeholderData: keepPreviousData,
-    refetchIntervalInBackground: true,
-    onSuccess(data: any) {
-      //   Toast({ title: "page refreshed", error: false });
-    },
-    onError: (error: any) => console.error(error),
-  });
-  const contact = useQuery({
+  // const single_contact = useQuery({
+  //   queryKey: ["single_contact", editData],
+  //   queryFn: fetchSingleContact,
+  //   refetchOnReconnect: true,
+  //   retry: 5,
+  //   retryDelay: 100,
+  //   staleTime: 5000,
+  //   refetchOnMount: true,
+  //   refetchInterval: 120000, // 2 minutes
+  //   placeholderData: keepPreviousData,
+  //   refetchIntervalInBackground: true,
+  //   onSuccess(data: any) {
+  //     //   Toast({ title: "page refreshed", error: false });
+  //   },
+  //   onError: (error: any) => console.error(error),
+  // });
+  const contact:any = useQuery({
     queryKey: ["contact"],
     queryFn: fetchContact,
     refetchOnReconnect: true,

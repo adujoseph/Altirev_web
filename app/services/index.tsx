@@ -21,16 +21,17 @@ export const getApi = async (url: string) => {
         return res.data;
       })
       .catch((err) => {
-        if (err.response.status === 401) {
+        if (err?.response?.status === 401) {
           window.location.replace("/login");
           localStorage.clear();
           Toast({ title: "Session Timeout", error: true });
         }
+        console.log('err', err)
         return err;
       });
   } catch (err: any) {
     console.error("err", err);
-    return err.response;
+    return err?.response;
   }
 };
 
