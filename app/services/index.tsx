@@ -26,7 +26,6 @@ export const getApi = async (url: string) => {
           localStorage.clear();
           Toast({ title: "Session Timeout", error: true });
         }
-        console.log('err', err)
         return err;
       });
   } catch (err: any) {
