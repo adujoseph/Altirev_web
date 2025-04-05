@@ -1,0 +1,25 @@
+name: 🚀 Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main  # Or your deploy branch (e.g. production)
+
+jobs:
+  deploy:
+    name: 🔄 Deploy App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Connect and deploy to EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd ${{ secrets.EC2_PATH }}
+            git pull origin main
+            npm install --legacy-peer-deps
+            npm run build
+            pm2 restart altirev-app || pm2 start npm --name "altirev-app" -- start
