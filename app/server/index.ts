@@ -17,12 +17,12 @@ export const getContacts = async (id?: string) => {
 
 export const getUsers = async (id: string) => {
   const res = await getApi(`v1/users/tenant/${id}`);
-  return res.data;
+  return res?.data;
 };
 
 export const getAllUsers = async () => {
   const res = await getApi(`v1/users`);
-  return res.data;
+  return res?.data;
 };
 export const getReports = async () => {
   const res = await getApi("reports");
@@ -47,7 +47,7 @@ export const getSingleElection = async (id: string) => {
 
 export const getSingleUser = async (id: string) => {
   const res = await getApi(`v1/users/${id}`);
-  return res.data ?? res;
+  return res?.data ?? res;
 };
 
 export const getSingleReports = async (id: string) => {
