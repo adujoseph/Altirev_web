@@ -15,10 +15,16 @@ export const list = [
   //   icon2: <Notification color="#2550C0" />,
   // },
   {
-    title: "Live",
+    title: "Live Feed",
     path: "/dashboard/liveFeed",
     icon: <LiveFeed color="#CBCBCB" />,
     icon2: <LiveFeed color="#2550C0" />,
+  },
+  {
+    title: "Report",
+    path: "/dashboard/report",
+    icon: <Report color="#CBCBCB" />,
+    icon2: <Report color="#2550C0" />,
   },
 ];
 // admin menu

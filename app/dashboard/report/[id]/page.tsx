@@ -2,12 +2,11 @@
 import useAuth from "@/app/components/Auth";
 import { FilterVotes } from "@/app/components/FilterVotes";
 import ModalCard from "@/app/components/modal/Modal";
-import Report from "@/app/components/Report";
 import ReportDetails from "@/app/components/ReportDetails";
 import useReport from "@/app/hooks/useReport";
 import { getSingleUser } from "@/app/server";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function page() {
   const { id }: string = useParams();
@@ -39,12 +38,14 @@ export default function page() {
     setSuccess,
     setUserDetails,
   } = useReport(id);
+  const [commsUser, setCommUser] = useState('')
   useEffect(() => {
     const getUser = async () => {
       const res = await getSingleUser(reportByID?.data?.userId);
+      setCommUser(`${res.firstName} ${res.lastName}`)
       setUserDetails({
         email: res?.email,
-        username: res?.username,
+        username: `${res.firstName} ${res.lastName}`,
         phoneNumber: res?.phoneNumber,
         status: res?.status,
         state: res?.location?.state?.stateName,
@@ -85,6 +86,7 @@ export default function page() {
         sendReport={sendReport}
         success={success}
         setSuccess={setSuccess}
+        commsUser={commsUser}
       />
     </>
   );

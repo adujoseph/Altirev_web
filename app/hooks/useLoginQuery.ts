@@ -76,7 +76,7 @@ export const useLoginQuery = () => {
         setSubmitting(false);
 
         Toast({
-          title:
+        title:
             data?.response?.data?.errors?.email ??
             data?.response?.data?.errors?.password,
           error: true,

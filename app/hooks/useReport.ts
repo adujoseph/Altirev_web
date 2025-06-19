@@ -47,9 +47,10 @@ export default function useReport(id: string) {
     setWardId,
   } = useStateLGA();
   const { results } = useResult("");
-  const handleDetails = (item: any) => {
+  const handleDetails = async (item: any) => {
     setDetails(true);
-    setDetailReport(item);
+    const resp = await fetchReportById(item?.id);
+    setDetailReport(resp)
     window.scrollTo(0, 0);
   };
   const fetchPendingReport = async () => {
@@ -139,10 +140,9 @@ export default function useReport(id: string) {
       console.error("Er", error);
     }
   };
-  const fetchReportById = async () => {
+  const fetchReportById = async (id: string) => {
     try {
-      const resp = await getSingleReports(resultID);
-
+      const resp = await getSingleReports(id ?? resultID);
       return resp;
     } catch (error) {
       console.error("Er", error);
@@ -180,7 +180,6 @@ export default function useReport(id: string) {
     },
     onError: (error: any) => console.error(error),
   });
-
   const pendingReport = useQuery({
     queryKey: ["pendingReport"],
     queryFn: fetchPendingReport,

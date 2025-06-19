@@ -43,7 +43,7 @@ export default function Plans() {
                             : "bg-[#2550C0]"
                         }`}
                       >
-                        Subscribe {item?.title}
+                        Subscribe to {item?.title}
                       </Link>
                     </span>
                     <div className="text-xs text-[#fff] flex flex-col space-y-4 mt-4">

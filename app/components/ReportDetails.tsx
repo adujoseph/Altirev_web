@@ -24,6 +24,7 @@ interface Props {
   setSuccess: (e?: any) => void;
   comment: string;
   success: boolean;
+  commsUser:string
 }
 
 export default function ReportDetails({
@@ -35,7 +36,7 @@ export default function ReportDetails({
   comment,
   userDetails,
   success,
-  setSuccess,
+  setSuccess,commsUser
 }: Props) {
   const [modal3, setModal3] = useState(false);
   const [modal, setModal] = useState(false);
@@ -282,7 +283,7 @@ export default function ReportDetails({
                   <div className="p-5 relative">
                     <p>{details?.status === "rejected" && <RejectedImg />}</p>
                     <p className="bottom-3 right-3 absolute">
-                      {user?.firstName}
+                      {commsUser}
                     </p>
                   </div>
                 </Card>
@@ -292,7 +293,7 @@ export default function ReportDetails({
                   <div className="p-5 relative">
                     <p>{details?.status === "approved" && <ApprovedImg />}</p>
                     <p className="bottom-3 right-3 absolute">
-                      {user?.firstName}
+                      {commsUser}
                     </p>
                   </div>
                 </Card>

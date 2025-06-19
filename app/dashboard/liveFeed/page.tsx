@@ -49,7 +49,6 @@ export default function page() {
                     onClick={() => handleDetails(i)}
                     className="flex items-center justify-between py-3 px-6 cursor-pointer"
                   >
-
                     <div className="flex items-center space-x-3">
                       {/* <span>
                         <img
@@ -59,7 +58,7 @@ export default function page() {
                         />
                       </span> */}
                       <span className="flex flex-col">
-                        <h2 className="font-medium">{i?.title} Polling Unit</h2>
+                        <h2 className="font-medium">{i?.LGA} Polling Unit</h2>
                         <small className="text-[#272727]">
                           {new Date(i?.createdAt)?.toDateString()}
                         </small>

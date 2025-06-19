@@ -33,7 +33,7 @@ export const PollingDetails = ({ type, handleDetails, data, loading }: Props) =>
           <BackArrow />
         </p>
         <div className="">
-          <h2 className="capitalize font-medium">{data?.title} Polling Unit</h2>
+          <h2 className="capitalize font-medium">{data?.lga} Polling Unit</h2>
           <p className="text-[#272727] text-sm">
             {new Date(data?.createdAt)?.toDateString()}
           </p>
