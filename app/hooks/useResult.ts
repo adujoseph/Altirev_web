@@ -11,7 +11,7 @@ import useStateLGA from "./useStateLGA";
 export default function useResult(id: string) {
   const [inputText, setInputText] = useState("");
   const deferedValue = useDeferredValue(inputText);
-  const { edit, setEdit, editData, setEditData } = useStateContext();
+  const { edit, setEdit, editData, setEditData,title } = useStateContext();
   const [loading, setLoading] = useState(false);
   const [tags, setTags] = useState("");
   const [modal, setModal] = useState(false);
@@ -277,7 +277,6 @@ export default function useResult(id: string) {
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
     onSuccess: (data) => {
-      console.log("data", data);
     },
 
     onError: (error: any) => console.error(error),
@@ -330,7 +329,6 @@ export default function useResult(id: string) {
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
     onSuccess: (data) => {
-      console.log("data", data);
     },
 
     onError: (error: any) => console.error(error),
@@ -378,6 +376,6 @@ export default function useResult(id: string) {
     editData,
     results,
     resultID,
-    setEditData,
+    setEditData,title
   };
 }

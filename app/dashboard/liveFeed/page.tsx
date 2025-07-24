@@ -58,12 +58,12 @@ export default function page() {
                         />
                       </span> */}
                       <span className="flex flex-col">
-                        <h2 className="font-medium">{i?.LGA} Polling Unit</h2>
+                        <h2 className="font-medium">{i?.ward}{', '}{i?.LGA} Polling Unit</h2>
                         <small className="text-[#272727]">
                           {new Date(i?.createdAt)?.toDateString()}
                         </small>
                       </span>
-                      {i?.accreditedVoters >= 0 ? (
+                      {i?.type !== 'report' ? (
                         <p className="p-2 bg-[#E4FFE4] w-max rounded text-sm font-medium">
                           Result
                         </p>

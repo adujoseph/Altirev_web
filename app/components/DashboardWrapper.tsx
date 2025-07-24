@@ -1,11 +1,15 @@
-'use client'
+"use client";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useMemo, useState } from "react";
 import { useStateContext } from "../context/context";
 import classNames from "classnames";
+import { useRouter } from "next/navigation";
+import { Toast } from "./Toast";
 
-function DashboardWrapper({ children }:any) {
+function DashboardWrapper({ children }: any) {
   const { openMenu, handleToggle, setOpenMenu } = useStateContext();
+  const token = localStorage.getItem("auth");
+  const navigate = useRouter();
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -24,6 +28,23 @@ function DashboardWrapper({ children }:any) {
   useMemo(() => {
     windowSize.width <= 1000 ? setOpenMenu(false) : setOpenMenu(true);
   }, [windowSize]);
+
+  function isTokenExpired(token: string) {
+    try {
+      const payload = JSON.parse(atob(token?.split(".")[1]));
+      const exp = payload?.exp * 1000; // Convert to ms
+      return Date.now() > exp;
+    } catch (e) {
+      return true; // If token is malformed, treat as expired
+    }
+  }
+  useEffect(() => {
+    if (!token) return;
+    if (isTokenExpired(token)) {
+      navigate.push("/login");
+      Toast({ title: "Session Expired", error: true });
+    }
+  }, [token]);
 
   return (
     <section

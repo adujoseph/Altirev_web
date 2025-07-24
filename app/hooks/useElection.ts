@@ -109,6 +109,7 @@ export default function useElection() {
     setEdit(false);
     setEditData(null);
   };
+  console.log('pastElection', pastElection)
 
   return {
     inputText,

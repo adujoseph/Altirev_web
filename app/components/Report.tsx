@@ -14,12 +14,11 @@ import useAuth from "./Auth";
 
 function Report() {
   const {  } = useAuth(["comms",'moderator']);
-
   const {
     inputText,
     setCategory,
     setEdit,
-    modal,
+    title,
     setModal,
     setInputText,
     edit,
@@ -48,7 +47,6 @@ function Report() {
     reportStatus,
     setComment,
   } = useReport("");
-
   return (
     <>
       {edit && table === "change status" && (
@@ -88,6 +86,7 @@ function Report() {
         inputText={inputText}
         category={category}
         setCategory={setCategory}
+        title={title}
       />
       <ReportTable
         loading={report.isLoading}
@@ -123,7 +122,7 @@ const ReportTable = ({ category, report, loading, user }: ReportTableProps) => (
               : "#272727"
           }
           dropdown={
-            user?.role === "comms" ? ["change status", "view report"] : []
+            user?.role === "comms" ? [ "view report"] : []
           }
           data={report}
         />
@@ -143,6 +142,7 @@ interface ReportHeaderProps {
   setInputText: (e?: any) => void;
   user: any;
   handleModal: () => void;
+  title:string
 }
 
 const ReportHeader = ({
@@ -151,11 +151,11 @@ const ReportHeader = ({
   setCategory,
   inputText,
   setInputText,
-  handleModal,
+  handleModal,title
 }: ReportHeaderProps) => (
   <aside className="flex items-center flex-col sm:flex-row space-y-3 sm:justify-between">
     <div className="flex items-center justify-center sm:justify-start w-full sm:w-1/2">
-      {user?.role !== "moderator" && (
+      {user?.role !== "moderator"  && title !== "Observer"&& (
         <>
           <div
             onClick={() => setCategory("new")}
@@ -179,6 +179,8 @@ const ReportHeader = ({
       >
         <p className="text-base">Approved</p>
       </div>
+      {title !== "Observer" && (
+
       <div
         onClick={() => setCategory("rejected")}
         className={
@@ -188,7 +190,7 @@ const ReportHeader = ({
         }
       >
         <p className="text-base">Rejected</p>
-      </div>
+      </div>)}
       <div
         onClick={() => setCategory("escalated")}
         className={

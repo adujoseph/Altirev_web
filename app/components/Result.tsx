@@ -44,7 +44,7 @@ function Result() {
     resultByID,
     loading,
     setEditData,
-    resultID,
+    resultID,title
   } = useResult("");
   return (
     <>
@@ -78,6 +78,7 @@ function Result() {
             inputText={inputText}
             category={category}
             setCategory={setCategory}
+            title={title}
           />
           <ResultTable
             loading={results.isLoading}
@@ -129,6 +130,7 @@ interface ResultHeaderProps {
   setInputText: (e?: any) => void;
   user: any;
   handleModal: () => void;
+  title:string
 }
 const ResultHeader = ({
   user,
@@ -136,11 +138,11 @@ const ResultHeader = ({
   setCategory,
   inputText,
   setInputText,
-  handleModal,
+  handleModal,title
 }: ResultHeaderProps) => (
   <aside className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between w-full">
     <div className="flex items-center justify-center sm:justify-start w-full sm:w-1/2">
-      {user?.role === "comms" && (
+      {user?.role === "comms" && title !== "Observer"&&  (
         <>
           <div
             onClick={() => setCategory("pending")}
@@ -164,6 +166,7 @@ const ResultHeader = ({
       >
         <p className="text-base">Approved</p>
       </div>
+      {title !== "Observer"&& 
       <div
         onClick={() => setCategory("rejected")}
         className={
@@ -173,7 +176,7 @@ const ResultHeader = ({
         }
       >
         <p className="text-base">Rejected</p>
-      </div>
+      </div>}
     </div>
     <div className="flex items-center space-x-2 w-full sm:w-1/2">
       <p className="">

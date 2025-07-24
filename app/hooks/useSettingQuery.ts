@@ -28,7 +28,6 @@ export const useSettingQuery = () => {
   const { mutate } = useMutation({
     mutationFn: () => postApi(`Admin/UpdatePassword`, payload),
     onSuccess: (data) => {
-      console.log('data', data)
       setLoading(false)
       Toast({ title: data.responseMessage, error: false })
       //   Toast({

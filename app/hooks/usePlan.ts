@@ -20,7 +20,6 @@ export default function usePlan() {
   const fetchPlan = async () => {
     try {
       const resp = await getPlans();
-      console.log('resp', resp)
       return resp;
     } catch (error) {
       console.error("Er", error);

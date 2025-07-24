@@ -45,15 +45,16 @@ export default function useAddUser(handleModal: any) {
       modId: username?.user?.altirevId,
     };
     const resp = await postApi(`elections/role/location`, payload);
-    if (resp?.id) {
+    if (resp?.altirevId) {
       Toast({ title: "Success", error: false });
       setLoading(false);
       handleModal();
       user?.refetch();
       return;
     }
-    Toast({ title: "Error Occurred", error: true });
-
+    else{
+      Toast({ title: "Error Occurred", error: true });
+    }
     setLoading(false);
   };
   const assignBulkRole = async (formData: any) => {
@@ -65,8 +66,7 @@ export default function useAddUser(handleModal: any) {
     const resp = await axios
       .post(
         process.env.NEXT_PUBLIC_API_URL +
-          `v1/users/bulk/${username?.user?.tenantId}/upload
-`,
+          `v1/users/bulk/${username?.user?.tenantId}/upload`,
         formData,
         {
           headers: {

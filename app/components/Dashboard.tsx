@@ -79,8 +79,9 @@ export default function Dashboard() {
   const changeProfile = (item: string) => {
     setTitle(item);
   };
+  
   return (
-    <>
+  <>
       {addUserModal && (
         <ModalCard open={addUserModal} setOpen={handleModal}>
           <FilterVotes

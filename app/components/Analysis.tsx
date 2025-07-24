@@ -7,13 +7,19 @@ import { BackArrow } from "../icons/Arrow";
 import ModalCard from "./modal/Modal";
 import { useStateContext } from "../context/context";
 import { addThousandSeparator } from "../utils";
+import useReport from "../hooks/useReport";
+import Link from "next/link";
 
-export default function Analysis({ setView, setOpenMenu, toggleFullscreen }: any) {
+export default function Analysis({
+  setView,
+  setOpenMenu,
+  toggleFullscreen,
+}: any) {
   const [show, setShow] = useState(false);
   const handleShow = () => setShow((prev) => !prev);
   const { electionData } = useStateContext();
-
-  const back = () => {
+  const { report } = useReport("");
+  const back = () => { 
     setView(1);
     setOpenMenu(true);
     toggleFullscreen();
@@ -37,7 +43,7 @@ export default function Analysis({ setView, setOpenMenu, toggleFullscreen }: any
         <p className="font-semibold text-[#272727]">Back</p>
       </span>
       <h2 className="text-center font-semibold text-xl">
-        {new Date(electionData?.date).getFullYear()} Gubernatorial Election
+        {new Date(electionData?.date).getFullYear()} {electionData?.name}
       </h2>
       <section className="w-full flex flex-col space-y-4 items-center sm:space-y-0 justify-center sm:justify-around sm:flex-row mt-10">
         <div className="">
@@ -53,13 +59,15 @@ export default function Analysis({ setView, setOpenMenu, toggleFullscreen }: any
           <span>
             <Incident />
           </span>
-          <span
-            onClick={handleShow}
+          <Link href='/dashboard/report'
+            // onClick={handleShow}
+        onClick={back}
+
             className="flex items-center text-red-500 font-semibold text-2xl ml-20 space-x-2 hover:underline cursor-pointer"
           >
-            <p>0</p>
+            <p>{report?.data?.length ?? 0}</p>
             <p>Incidents</p>
-          </span>
+          </Link>
         </div>
         <div className="">
           <PieChart electiondetails={electionData} />

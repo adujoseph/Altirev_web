@@ -35,22 +35,24 @@ function Role() {
     agentList,
     commsList,
     loading,
+    userDetails,
+    setUserDetails,
     suspendUser,
   } = useRole();
-    const {
-      states,
-      stateLga,
-      setStateId,
-      stateId,
-      setStateLgaId,
-      stateLgaId,
-      setWardId,
-      pollingUnit,
-      setPollingUnitId,
-      wardId,
-      pollingUnitId,
-      ward,
-    } = useReport("");
+  const {
+    states,
+    stateLga,
+    setStateId,
+    stateId,
+    setStateLgaId,
+    stateLgaId,
+    setWardId,
+    pollingUnit,
+    setPollingUnitId,
+    wardId,
+    pollingUnitId,
+    ward,
+  } = useReport("");
   return (
     <div>
       {modal && <AssignRoles modal={modal} handleModal={handleModal} />}
@@ -95,8 +97,11 @@ function Role() {
       )}
       {edit && table === "profile" && (
         <UserDetails
-          data={editData}
-          handleModal={() => setEdit(false)}
+          data={userDetails}
+          handleModal={() => {
+            setEdit(false);
+            setUserDetails(null);
+          }}
           modal={edit}
         />
       )}

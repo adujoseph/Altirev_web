@@ -5,15 +5,21 @@ import { useAppSelector } from "../redux/hook";
 import { patchApi } from "../services";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { ReportType, User } from "../typings";
-import { getSingleReports, getSingleUser, getTenantReports } from "../server";
+import {
+  getSingleReports,
+  getSingleResult,
+  getSingleUser,
+  getTenantReports,
+} from "../server";
 import useStateLGA from "./useStateLGA";
 import { Toast } from "../components/Toast";
 import useResult from "./useResult";
+import { it } from "node:test";
 
 export default function useReport(id: string) {
   const [inputText, setInputText] = useState("");
   const deferedValue = useDeferredValue(inputText);
-  const { edit, setEdit, table, editData } = useStateContext();
+  const { edit, setEdit, table, editData, title } = useStateContext();
   const [modal, setModal] = useState(false);
   const [userDetails, setUserDetails] = useState<User>();
   const user: User = useAppSelector((state) => state?.user?.user);
@@ -49,8 +55,20 @@ export default function useReport(id: string) {
   const { results } = useResult("");
   const handleDetails = async (item: any) => {
     setDetails(true);
-    const resp = await fetchReportById(item?.id);
-    setDetailReport(resp)
+
+    if (item?.type === "report") {
+      const resp = await fetchReportById(item?.id);
+      setDetailReport(resp);
+      return;
+    } else {
+      const resp = await getSingleResult(item?.id);
+      setDetailReport({
+        ...resp,
+        pollingUnit:`${item.ward} ${item.LGA}`,
+        createdAt: item?.createdAt,
+      });
+    }
+
     window.scrollTo(0, 0);
   };
   const fetchPendingReport = async () => {
@@ -66,6 +84,7 @@ export default function useReport(id: string) {
             PU: `${item?.pollingUnit}`,
             status: `${item?.status}`,
             id: `${item?.id}`,
+            type: `report`,
             createdAt: `${item?.createdAt}`,
           });
         });
@@ -89,6 +108,7 @@ export default function useReport(id: string) {
             ward: `${item?.ward}`,
             PU: `${item?.pollingUnit}`,
             status: `${item?.status}`,
+            type: `report`,
             id: `${item?.id}`,
             createdAt: `${item?.createdAt}`,
           });
@@ -110,6 +130,7 @@ export default function useReport(id: string) {
             ward: `${item?.ward}`,
             PU: `${item?.pollingUnit}`,
             status: `${item?.status}`,
+            type: `report`,
             id: `${item?.id}`,
             createdAt: `${item?.createdAt}`,
           });
@@ -131,6 +152,7 @@ export default function useReport(id: string) {
             ward: `${item?.ward}`,
             PU: `${item?.pollingUnit}`,
             status: `${item?.status}`,
+            type: `report`,
             id: `${item?.id}`,
             createdAt: `${item?.createdAt}`,
           });
@@ -140,9 +162,11 @@ export default function useReport(id: string) {
       console.error("Er", error);
     }
   };
-  const fetchReportById = async (id: string) => {
+
+  const fetchReportById = async (report_id: string) => {
     try {
-      const resp = await getSingleReports(id ?? resultID);
+      const reportId = resultID ? resultID : report_id;
+      const resp = await getSingleReports(reportId);
       return resp;
     } catch (error) {
       console.error("Er", error);
@@ -160,7 +184,6 @@ export default function useReport(id: string) {
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
     onSuccess: (data) => {
-      console.log("data", data);
     },
     onError: (error: any) => console.error(error),
   });
@@ -237,8 +260,7 @@ export default function useReport(id: string) {
       ? approvedReport
       : escalatedReport;
 
-  const total_report = report?.data?.concat(results);
-
+  const total_report = report?.data?.concat(results?.data);
   const total_report_search = useMemo(
     () =>
       deferedValue
@@ -311,6 +333,7 @@ export default function useReport(id: string) {
     inputText,
     success,
     setCategory,
+    title,
     setEdit,
     modal,
     report,

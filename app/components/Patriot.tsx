@@ -17,6 +17,7 @@ export default function Patriot({
   handleModal,
   setView,
 }: PatriotProps) {
+
   const { pastElection } = useElection();
   const data = [
     ["Parties", "No of Votes"],
