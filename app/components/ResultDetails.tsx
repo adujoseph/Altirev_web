@@ -104,11 +104,10 @@ export default function Details({
   const changeResultstatus = async () => {
     if (details?.status === "pending") {
       const resp = await patchApi(`polls/change-status/${details?.id}`, {
-      reasons: '',
-      status: 'processing',
-      modifiedBy: user?.altirevId,
-    });
-    
+        reasons: "",
+        status: "processing",
+        modifiedBy: user?.altirevId,
+      });
     }
     return;
   };
@@ -120,6 +119,51 @@ export default function Details({
   useEffect(() => {
     details?.counts && countArr();
   }, [details?.counts]);
+
+  async function watermarkImageFromURL(
+    imageUrl: string,
+    watermarkText: string
+  ) {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/proxy-image?url=` + encodeURIComponent(imageUrl);
+    const img = new Image();
+    img.crossOrigin = "anonymous"; // Important if the image is from another domain
+    img.src = imageUrl;
+
+    img.onload = () => {
+      // Create canvas
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const ctx: any = canvas.getContext("2d");
+
+      // Draw image on canvas
+      ctx.drawImage(img, 0, 0);
+
+      // Add watermark
+      ctx.font = "48px Arial";
+      ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
+      ctx.rotate(-Math.PI / 6);
+      ctx.fillText(watermarkText, img.width / 4, img.height / 2);
+
+      // Convert canvas to Blob and download
+      canvas.toBlob((blob: any) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${details?.location?.pollingUnit?.pollingUnit}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    };
+
+    img.onerror = () => {
+      console.error("Image failed to load");
+    };
+  }
+
   return (
     <>
       {modal && (
@@ -252,20 +296,24 @@ export default function Details({
                         This is the CTC copy taken by the agent
                       </p>
                       <hr className="my-4" />
-                      <div className="bg-[#CBCBCB] flex items-center justify-center p-2 flex-col relative">
+                      <div
+                      
+                        className="bg-[#CBCBCB] flex items-center justify-center p-2 flex-col relative"
+                      >
                         <img
                           className="size-[100px] "
                           src={details?.fileUrl ?? ""}
                           alt="doc"
                         />
-                        <a
-                          download
-                          target="_blank"
-                          href={details?.fileUrl ?? ""}
-                          className="ml-auto  absolute bottom-3 cursor-pointer right-10"
-                        >
+                        <p 
+                          onClick={() =>
+                            watermarkImageFromURL(
+                              details?.fileUrl as string,
+                              "Alitrev"
+                            )
+                          } className="ml-auto  absolute bottom-3 cursor-pointer right-10">
                           <DownloadVotes />
-                        </a>
+                        </p>
                       </div>
                     </div>
                   </section>
@@ -371,7 +419,7 @@ export default function Details({
                   <div className="p-5 relative">
                     <p>{details?.status === "rejected" && <RejectedImg />}</p>
                     <p className="bottom-3 right-3 absolute">
-                      {user?.firstName}
+                      {`${user?.firstName} ${user.lastName}`}
                     </p>
                   </div>
                 </Card>
@@ -381,7 +429,7 @@ export default function Details({
                   <div className="p-5 relative">
                     <p>{details?.status === "approved" && <ApprovedImg />}</p>
                     <p className="bottom-3 right-3 absolute">
-                      {user?.firstName}
+                      {`${user?.firstName} ${user.lastName}`}
                     </p>
                   </div>
                 </Card>

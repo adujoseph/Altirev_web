@@ -178,7 +178,6 @@ export const useSignUpQuery = () => {
     mutationFn: () => postApi(`v1/auth/initiate`, payload2),
     onSuccess: (data) => {
       if (data?.status === "success") {
-        console.log("data", data);
         Toast({ title: data?.message, error: false });
         setSubmitting(false);
         getOtp();

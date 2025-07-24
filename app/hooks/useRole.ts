@@ -1,7 +1,7 @@
 "use client";
 import React, { useDeferredValue, useMemo, useState } from "react";
 import { useStateContext } from "../context/context";
-import { getAllUsers } from "../server";
+import { getAllUsers, getSingleUser } from "../server";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { User } from "../typings";
 import { useAppSelector } from "../redux/hook";
@@ -21,28 +21,27 @@ export default function useRole() {
   const [modal3, setModal3] = useState(false);
   const [loadingUser, setLoadingUser] = useState(false);
   const User: User = useAppSelector((state) => state?.user?.user);
+  const [userDetails, setUserDetails] = useState<any>();
 
   const handleModal3 = () => setModal3((prev) => !prev);
   const { edit, table, setEdit, editData } = useStateContext();
   const fetchUser = async () => {
     try {
       const resp = await getApi(`v1/users/tenant/${User.tenantId}`);
-          const arr: any = [];
-          resp?.length > 0 &&
-            resp?.forEach((employee: any) => {
-              arr.push({
-                username: employee?.username,
-                email: employee?.email,
-                phoneNumber: employee?.phoneNumber,
-                state: employee?.location?.state?.stateName,
-                LGA: employee?.location?.lga?.lgaName,
-                PU: employee?.location?.pollingUnit?.pollingUnit,
-                ward: employee?.location?.ward?.wardName,
-                role: employee?.role,
-                status: employee?.status,
-                altirevId: employee?.altirevId,
-              });
-            });
+      const arr: any = [];
+      resp?.length > 0 &&
+        resp?.forEach((employee: any) => {
+          arr.push({
+            email: employee?.email,
+            state: employee?.location?.state?.stateName,
+            LGA: employee?.location?.lga?.lgaName,
+            ward: employee?.location?.ward?.wardName,
+            PU: employee?.location?.pollingUnit?.pollingUnit,
+            role: employee?.role,
+            status: employee?.status,
+            altirevId: employee?.altirevId,
+          });
+        });
       setCommsList(arr?.filter((res: User) => res?.role === "comms"));
       setAgentList(arr?.filter((res: User) => res?.role === "agent"));
       setActive(arr?.filter((res: User) => res?.status === "active"));
@@ -155,8 +154,42 @@ export default function useRole() {
   const activeAgentLists = agentLists?.filter(
     (res: User) => res?.status === "active"
   );
+  const fetchSingleContact = async () => {
+    try {
+      const res = await getSingleUser(editData?.altirevId);
+      setUserDetails({
+        email: res?.email,
+        username: `${res.firstName} ${res.lastName}`,
+        phoneNumber: res?.phoneNumber,
+        status: res?.status,
+        state: res?.location?.state?.stateName,
+        LGA: res?.location?.lga?.lgaName,
+        ward: res?.location?.ward?.wardName,
+        PU: res?.location?.pollingUnit?.pollingUnit,
+      });
+    } catch (error) {
+      console.error("Er", error);
+    }
+  };
+  const single_contact = useQuery({
+    queryKey: ["single_contact", editData],
+    queryFn: fetchSingleContact,
+    refetchOnReconnect: true,
+    retry: 5,
+    retryDelay: 100,
+    staleTime: 5000,
+    refetchOnMount: true,
+    refetchInterval: 120000, // 2 minutes
+    placeholderData: keepPreviousData,
+    refetchIntervalInBackground: true,
+    onSuccess(data: any) {
+      //   Toast({ title: "page refreshed", error: false });
+    },
+    onError: (error: any) => console.error(error),
+  });
   return {
-    inputText,activeAgentLists,
+    inputText,
+    activeAgentLists,
     setInputText,
     setEdit,
     handleModal,
@@ -179,5 +212,7 @@ export default function useRole() {
     loadingUser,
     allUserSearch,
     allUser,
+    userDetails,
+    setUserDetails,
   };
 }

@@ -33,7 +33,7 @@ export const PollingDetails = ({ type, handleDetails, data, loading }: Props) =>
           <BackArrow />
         </p>
         <div className="">
-          <h2 className="capitalize font-medium">{data?.lga} Polling Unit</h2>
+          <h2 className="capitalize font-medium">{data?.pollingUnit} Polling Unit</h2>
           <p className="text-[#272727] text-sm">
             {new Date(data?.createdAt)?.toDateString()}
           </p>
@@ -97,7 +97,7 @@ export const PollingDetails = ({ type, handleDetails, data, loading }: Props) =>
             <>
               <section className="p-5">
                 <h2 className="bg-[#272727] text-white rounded w-max py-2 px-7">
-                  Presidential Result
+                   Result
                 </h2>
                 <aside className="flex space-y-2 flex-col">
                   <Votes
@@ -126,10 +126,12 @@ export const PollingDetails = ({ type, handleDetails, data, loading }: Props) =>
                   </p>
                   <hr className="my-4" />
                   <div className="bg-[#CBCBCB] flex items-center justify-center p-2 flex-col relative">
-                    <Image src={data?.imageUrl} alt="doc" />
-                    <p className="ml-auto  absolute bottom-3 cursor-pointer right-10">
+                    <img className="size-[300px] object-cover" src={data?.fileUrl} alt="doc" />
+                    <a href={data?.fileUrl as string} 
+                          target="_blank"
+                          download className="ml-auto  absolute bottom-3 cursor-pointer right-10">
                       <DownloadVotes />
-                    </p>
+                    </a>
                   </div>
                 </div>
               </section>

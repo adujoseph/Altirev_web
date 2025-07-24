@@ -32,25 +32,28 @@ export default function page() {
     editData,
     setEditData,
     resultByID,
-    tags,setUserDetails,
-    setTags,addTags,tagsList
+    tags,
+    setUserDetails,
+    setTags,
+    addTags,
+    tagsList,
   } = useResult(id);
-   useEffect(() => {
-      const getUser = async () => {
-        const res = await getSingleUser(resultByID?.data?.userAltirevId);
-        setUserDetails({
-          email: res?.email,
-          username: res?.username,
-          phoneNumber: res?.phoneNumber,
-          status: res?.status,
-          state: res?.location?.state?.stateName,
-          LGA: res?.location?.lga?.lgaName,
-          ward: res?.location?.ward?.wardName,
-          PU: res?.location?.pollingUnit?.pollingUnit,
-        });
-      };
-      if (resultByID?.data?.userAltirevId) getUser();
-    }, [resultByID?.data]);
+  useEffect(() => {
+    const getUser = async () => {
+      const res = await getSingleUser(resultByID?.data?.userAltirevId);
+      setUserDetails({
+        email: res?.email,
+        username: `${res.firstName} ${res.lastName}`,
+        phoneNumber: res?.phoneNumber,
+        status: res?.status,
+        state: res?.location?.state?.stateName,
+        LGA: res?.location?.lga?.lgaName,
+        ward: res?.location?.ward?.wardName,
+        PU: res?.location?.pollingUnit?.pollingUnit,
+      });
+    };
+    if (resultByID?.data?.userAltirevId) getUser();
+  }, [resultByID?.data]);
   return (
     <>
       {modal && (

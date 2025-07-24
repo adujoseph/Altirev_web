@@ -24,7 +24,7 @@ interface Props {
   setSuccess: (e?: any) => void;
   comment: string;
   success: boolean;
-  commsUser:string
+  commsUser: string;
 }
 
 export default function ReportDetails({
@@ -36,7 +36,8 @@ export default function ReportDetails({
   comment,
   userDetails,
   success,
-  setSuccess,commsUser
+  setSuccess,
+  commsUser,
 }: Props) {
   const [modal3, setModal3] = useState(false);
   const [modal, setModal] = useState(false);
@@ -78,7 +79,6 @@ export default function ReportDetails({
   const changeReportstatus = () => {
     if (details?.status === "pending") sendReport("processing");
     setSuccess(false);
-
     return;
   };
 
@@ -145,14 +145,15 @@ export default function ReportDetails({
                 / {result?.time12}
               </p>
             </div>
-            {details?.status !== "escalated" && user.role !== "moderator" && (
-              <h2
-                onClick={handleEscalateModal}
-                className="bg-[#272727] cursor-pointer text-white rounded w-max py-2 px-7"
-              >
-                Escalate to Moderator
-              </h2>
-            )}
+            {details?.status !== "escalated" &&
+              user.role.toLowerCase() !== "moderator" && (
+                <h2
+                  onClick={handleEscalateModal}
+                  className="bg-[#272727] cursor-pointer text-white rounded w-max py-2 px-7"
+                >
+                  Escalate to Moderator
+                </h2>
+              )}
           </div>
 
           <hr className="my-5 bg-[#CBCBCB]" />
@@ -251,7 +252,7 @@ export default function ReportDetails({
                   </span>
                 </div>
               </Card>
-             {details?.status === "processing" && user?.role === "comms" && (
+              {details?.status === "processing" && user?.role === "comms" && (
                 <Card>
                   <div className="flex items-center justify-center flex-col p-5 space-y-2">
                     <button
@@ -283,7 +284,7 @@ export default function ReportDetails({
                   <div className="p-5 relative">
                     <p>{details?.status === "rejected" && <RejectedImg />}</p>
                     <p className="bottom-3 right-3 absolute">
-                      {commsUser}
+                      {`${user?.firstName} ${user.lastName}`}
                     </p>
                   </div>
                 </Card>
@@ -293,7 +294,20 @@ export default function ReportDetails({
                   <div className="p-5 relative">
                     <p>{details?.status === "approved" && <ApprovedImg />}</p>
                     <p className="bottom-3 right-3 absolute">
-                      {commsUser}
+                      {`${user?.firstName} ${user.lastName}`}
+                    </p>
+                  </div>
+                </Card>
+              )}
+              {details?.status === "escalated" && (
+                <Card>
+                  <div className="p-5 relative">
+                    <p className="text-[#333] font-bold italic rounded-md border-2 border-black px-5 py-1 w-max  text-xl">
+                      escalated
+                      {/* {details?.status === "escalated" && <ApprovedImg />} */}
+                    </p>
+                    <p className="bottom-3 right-3 absolute">
+                      {`${user?.firstName} ${user.lastName}`}
                     </p>
                   </div>
                 </Card>

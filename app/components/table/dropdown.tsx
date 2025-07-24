@@ -8,6 +8,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { styled, alpha } from "@mui/material/styles";
 import { useStateContext } from "../../context/context";
 import { useRouter } from "next/navigation";
+import { getSingleUser } from "@/app/server";
 
 interface Body {
   title: string;
@@ -47,9 +48,10 @@ const Dropdown = ({ title, subtitle, data, action }: Props) => {
   const handleBtn = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleResult = () => {
+  const handleResult = async() => {
     if (action === "view contact") {
       setEdit(true);
+      const res = await getSingleUser(data?.altirevId)
       setEditData(data);
     }
     if (action === "view result") {

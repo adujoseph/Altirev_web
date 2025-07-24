@@ -26,6 +26,12 @@ export const list = [
     icon: <Report color="#CBCBCB" />,
     icon2: <Report color="#2550C0" />,
   },
+  {
+    title: "Result",
+    path: "/dashboard/result",
+    icon: <Result color="#CBCBCB" />,
+    icon2: <Result color="#2550C0" />,
+  },
 ];
 // admin menu
 

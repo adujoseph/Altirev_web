@@ -82,10 +82,9 @@ export const useContactQuery = () => {
   const fetchSingleContact = async () => {
     try {
       const res = await getSingleUser(editData?.altirevId);
-      console.log('res', res)
       setUserDetails({
         email: res?.email,
-        username: res?.username,
+        username: `${res.firstName} ${res.lastName}`,
         phoneNumber: res?.phoneNumber,
         status: res?.status,
         state: res?.location?.state?.stateName,
@@ -105,22 +104,22 @@ export const useContactQuery = () => {
       console.error("Er", error);
     }
   };
-  // const single_contact = useQuery({
-  //   queryKey: ["single_contact", editData],
-  //   queryFn: fetchSingleContact,
-  //   refetchOnReconnect: true,
-  //   retry: 5,
-  //   retryDelay: 100,
-  //   staleTime: 5000,
-  //   refetchOnMount: true,
-  //   refetchInterval: 120000, // 2 minutes
-  //   placeholderData: keepPreviousData,
-  //   refetchIntervalInBackground: true,
-  //   onSuccess(data: any) {
-  //     //   Toast({ title: "page refreshed", error: false });
-  //   },
-  //   onError: (error: any) => console.error(error),
-  // });
+  const single_contact = useQuery({
+    queryKey: ["single_contact", editData],
+    queryFn: fetchSingleContact,
+    refetchOnReconnect: true,
+    retry: 5,
+    retryDelay: 100,
+    staleTime: 5000,
+    refetchOnMount: true,
+    refetchInterval: 120000, // 2 minutes
+    placeholderData: keepPreviousData,
+    refetchIntervalInBackground: true,
+    onSuccess(data: any) {
+      //   Toast({ title: "page refreshed", error: false });
+    },
+    onError: (error: any) => console.error(error),
+  });
   const contact:any = useQuery({
     queryKey: ["contact"],
     queryFn: fetchContact,
@@ -172,6 +171,6 @@ export const useContactQuery = () => {
     setInputText,
     contactSearch,
     fetchSingleContact,
-    userDetails,
+    userDetails,setUserDetails
   };
 };

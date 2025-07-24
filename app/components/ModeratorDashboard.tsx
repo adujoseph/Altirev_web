@@ -38,6 +38,7 @@ export default function ModeratorDashboard({ setCategory, category, setView }: P
   const { pastElection } = useElection();
   return (
     <>
+    
       {modal && (
         <ModalCard open={modal} setOpen={handleModal}>
           <FilterVotes

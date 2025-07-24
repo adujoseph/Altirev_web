@@ -21,7 +21,7 @@ export default function page() {
     setModal,
     handleModal,
     inputText,
-    setInputText,
+    setInputText,setUserDetails,
     contactSearch,userDetails
   } = useContactQuery();
   // const { user } = useAuth("moderator");
@@ -64,7 +64,9 @@ export default function page() {
         <UserDetails
           data={userDetails}
           modal={edit}
-          handleModal={() => setEdit(false)}
+          handleModal={() => {setEdit(false)
+            setUserDetails(null)
+          }}
         />
       )}
       <h1 className="text-xl text-[#272727] font-semibold">Contact List</h1>

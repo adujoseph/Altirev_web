@@ -38,7 +38,6 @@ export default function PastLive({ handleModal, data, loading }: any) {
         partyColor: partyColor ? partyColor.color : null,
       };
     });
-
     setElectionDetails({
       date: details?.createdAt,
       resultArray: mergedData,
@@ -49,6 +48,7 @@ export default function PastLive({ handleModal, data, loading }: any) {
     setShowOverview(true);
     setElectionData({
       date: details?.createdAt,
+      name: details?.name,
     ...resp,
     });
     setShow(false);
@@ -239,10 +239,11 @@ export default function PastLive({ handleModal, data, loading }: any) {
         <VoteBreakDown
           data={{
             totalVotes: electiondetails?.totalVotesCasted,
-
             results: electiondetails?.resultArray,
           }}
-          setView={setView}
+          setView={setView as never}
+          handleModal={handleModal}
+
         />
       )}
 

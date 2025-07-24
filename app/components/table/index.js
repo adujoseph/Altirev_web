@@ -8,12 +8,15 @@ import ArrowUp from "../../icons/ArrowUp";
 import { SquareIcon } from "../../icons/ManageUser";
 import Dropdown from "./dropdown";
 import { ArrowView } from "@/app/icons/Arrow";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import moment from 'moment'
+import { useStateContext } from "@/app/context/context";
+
 export function Products({ data, dropdown, action, color }) {
   const [products, setProducts] = useState([]);
   const pathname = usePathname();
- 
+  const navigate = useRouter();
+  const { setEditData } = useStateContext();
   const productsData = useMemo(
     () =>
       products?.length > 0
@@ -80,9 +83,10 @@ export function Products({ data, dropdown, action, color }) {
                 key !== "lastName" &&
                 key !== "title" &&
                 key !== "country" &&
-                // key !== "state" &&
+                key !== "email" &&
                 key !== "isActive" &&
                 key !== "gender" &&
+                key !== "type" &&
                 // key !== "createdAt" &&
                 key !== "dateCreated" &&
                 key !== "reasons" &&
@@ -217,6 +221,14 @@ export function Products({ data, dropdown, action, color }) {
   }, [data]);
 
   const isEven = (idx) => idx % 2 === 0;
+  const handleRoute = (data) =>{
+    if (pathname === "/dashboard/report") {
+      navigate.push(`/dashboard/report/${data?.id}`);
+      setEditData(data);
+      return
+    }
+  
+  }
   return (
     <>
       <div className="w-full">
@@ -268,7 +280,7 @@ export function Products({ data, dropdown, action, color }) {
                 <tr
                   key={idx}
                   {...row?.getRowProps()}
-                  className={`  border-y-[1px]  ${
+                  className={`cursor-pointer border-y-[1px]  ${
                     isEven(idx) ? "  text-xs" : " text-xs"
                   }`}
                 >
@@ -281,6 +293,7 @@ export function Products({ data, dropdown, action, color }) {
                     <>
                       <td
                         key={idx}
+                        onClick={() => handleRoute(row?.original)}
                         className={classNames("text-xs px-3 py-1 lg:px-5", {
                           "bg-green-500  text-white rounded flex items-center justify-center mt-2 h-[25px] w-[10px] p-3":
                             cell.value === true,

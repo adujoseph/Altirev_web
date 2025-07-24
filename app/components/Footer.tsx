@@ -9,12 +9,13 @@ import {
 import Image from "next/image";
 import vector from "@/app/imgs/grey.png";
 import { WhiteLogo } from "../icons/Logo";
+import Link from "next/link";
 
 export default function Footer() {
   const backToTop = () => window.scrollTo(0, 0);
   return (
-    <div className="bg-[#181818] sm:h-[300px] text-white  !overflow-hidden relative z-10">
-      <div className="flex items-center absolute justify-center mt-4 w-full">
+    <div className="bg-[#181818] text-white  !overflow-hidden relative z-10">
+      <div className="flex items-center absolute justify-center  -z-10 mt-4 w-full">
         <Image src={vector} className="w-full -ml-20" alt="" />
         <Image src={vector} className="w-full mt-60" alt="" />
         <Image src={vector} className="w-full ml-40" alt="" />
@@ -60,7 +61,15 @@ export default function Footer() {
       </div>
 
       <hr className="my-7" />
-      <p className="text-center">All rights Reserved</p>
+      <div className="flex items-center flex-wrap !z-[9999] space-x-5 justify-center my-7">
+        <p className="text-center">All rights Reserved</p>
+        <Link href="/privacy" className="text-center cursor-pointer">
+          Privacy Policy
+        </Link>
+        <Link href="/delete" className="text-center cursor-pointer">
+          Delete account Request
+        </Link>
+      </div>
     </div>
   );
 }

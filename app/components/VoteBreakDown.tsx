@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { politicalPartyNames } from "../constant/paries";
 import { BackArrow, FilterView } from "../icons/Arrow";
 import { addThousandSeparator } from "../utils";
@@ -9,10 +9,10 @@ import BarChartRace from "./d3Chart";
 interface Props {
   data?: any;
   setView: (e?: number) => void;
+  handleModal:() => void
 }
 
-export const VoteBreakDown = ({ data, setView }: Props) => {
-
+export const VoteBreakDown = memo(({ data, setView,handleModal }: Props) => {
   return (
     <div>
       <span
@@ -26,7 +26,7 @@ export const VoteBreakDown = ({ data, setView }: Props) => {
       </span>
       <span className="flex items-center justify-between">
         <h2 className="font-bold text-2xl">Vote Breakdown</h2>
-        <p className="w-max border-[1px] border-[#CBCBCB] rounded flex items-center justify-center p-2">
+        <p onClick={handleModal} className="w-max border-[1px] cursor-pointer border-[#CBCBCB] rounded flex items-center justify-center p-2">
           <FilterView />
         </p>
       </span>
@@ -60,4 +60,4 @@ export const VoteBreakDown = ({ data, setView }: Props) => {
       </section>
     </div>
   );
-};
+});
