@@ -14,12 +14,13 @@ import {
 import useStateLGA from "./useStateLGA";
 import { Toast } from "../components/Toast";
 import useResult from "./useResult";
-import { it } from "node:test";
+import useElection from "./useElection";
 
 export default function useReport(id: string) {
   const [inputText, setInputText] = useState("");
   const deferedValue = useDeferredValue(inputText);
-  const { edit, setEdit, table, editData, title } = useStateContext();
+  const { edit, setEdit, table, editData, title, setIsEscalated } =
+    useStateContext();
   const [modal, setModal] = useState(false);
   const [userDetails, setUserDetails] = useState<User>();
   const user: User = useAppSelector((state) => state?.user?.user);
@@ -52,7 +53,8 @@ export default function useReport(id: string) {
     setPollingUnitId,
     setWardId,
   } = useStateLGA();
-  const { results } = useResult("");
+  const { approvedResult } = useResult("");
+  const { pastElection } = useElection("");
   const handleDetails = async (item: any) => {
     setDetails(true);
 
@@ -64,7 +66,7 @@ export default function useReport(id: string) {
       const resp = await getSingleResult(item?.id);
       setDetailReport({
         ...resp,
-        pollingUnit:`${item.ward} ${item.LGA}`,
+        pollingUnit: `${item.ward} ${item.LGA}`,
         createdAt: item?.createdAt,
       });
     }
@@ -183,8 +185,7 @@ export default function useReport(id: string) {
     refetchInterval: 12000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-    onSuccess: (data) => {
-    },
+    onSuccess: (data) => {},
     onError: (error: any) => console.error(error),
   });
   const escalatedReport = useQuery({
@@ -260,7 +261,14 @@ export default function useReport(id: string) {
       ? approvedReport
       : escalatedReport;
 
-  const total_report = report?.data?.concat(results?.data);
+  useEffect(() => {
+    if (!title) return;
+    if (title === "Observer") setCategory("approved");
+  }, [title]);
+
+  const total_report = approvedReport?.data
+    ?.concat(approvedResult?.data)
+    ?.concat(pastElection?.data?.ongoing);
   const total_report_search = useMemo(
     () =>
       deferedValue
@@ -330,6 +338,8 @@ export default function useReport(id: string) {
     report?.refetch();
   }, [category]);
   return {
+    escalatedReport,
+    setIsEscalated,
     inputText,
     success,
     setCategory,

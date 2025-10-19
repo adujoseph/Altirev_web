@@ -18,7 +18,7 @@ import { Close, Close2 } from "../icons/Close";
 import { Logo } from "../icons/Logo";
 
 export default function Sidebar() {
-  const { openMenu, title, setEdit, setOpenMenu } = useStateContext();
+  const { openMenu, title, setEdit, setOpenMenu,setIsEscalated } = useStateContext();
   const pathname = usePathname();
   const user: User = useAppSelector((state) => state?.user?.user);
   const dispatch = useDispatch();
@@ -69,6 +69,7 @@ export default function Sidebar() {
     // Prefetch the page
     navigate.prefetch("/login");
   }, [navigate]);
+
   return (
     <div
       className={classNames("", {

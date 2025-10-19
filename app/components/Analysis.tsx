@@ -19,11 +19,14 @@ export default function Analysis({
   const handleShow = () => setShow((prev) => !prev);
   const { electionData } = useStateContext();
   const { report } = useReport("");
-  const back = () => { 
+
+  const back = () => {
     setView(1);
     setOpenMenu(true);
     toggleFullscreen();
   };
+  const totalVote =
+    electionData?.totalVotesCasted + electionData?.totalInvalidVotes;
   return (
     <div className="px-0 sm:px-20">
       {show && (
@@ -49,9 +52,7 @@ export default function Analysis({
         <div className="">
           <CircularProgressBar
             percentage={
-              (
-                electionData?.totalInvalidVotes / electionData.totalVotesCasted
-              )?.toFixed(2) * 100
+            (  (totalVote / electionData?.totalAccreditedVoters) * 100)?.toFixed(2) ?? 0
             }
           />
         </div>
@@ -59,10 +60,10 @@ export default function Analysis({
           <span>
             <Incident />
           </span>
-          <Link href='/dashboard/report'
+          <Link
+            href="/dashboard/report/escalated"
             // onClick={handleShow}
-        onClick={back}
-
+            onClick={back}
             className="flex items-center text-red-500 font-semibold text-2xl ml-20 space-x-2 hover:underline cursor-pointer"
           >
             <p>{report?.data?.length ?? 0}</p>
@@ -77,7 +78,7 @@ export default function Analysis({
         <div>
           <p className="text-xl text-[#272727]">Vote Casted</p>
           <h1 className="text-4xl font-semibold">
-            {addThousandSeparator(electionData?.totalVotesCasted)}
+            {addThousandSeparator(totalVote)}
           </h1>
         </div>
         <div>

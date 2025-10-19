@@ -22,12 +22,17 @@ export default function useElection() {
   const defaultValue = {
     name: "",
     description: "",
-    status: "",
+    startdate: "",
+    enddate: "",
+    electiondate: "",
   };
   const validationSchema = yup.object().shape({
     name: yup.string().label("name").required(),
     description: yup.string().label("description").required(),
-    status: yup.string().label("status").required(),
+    // status: yup.string().label("status").required(),
+    startdate:yup.date().label("startdate").required(),
+    enddate:yup.date().label("enddate").required(),
+    electiondate:yup.date().label("electiondate").required()
   });
 
   const fetchPastElection = async () => {
@@ -38,6 +43,15 @@ export default function useElection() {
       console.error("Er", error);
     }
   };
+  function sortByDateDescending<T>(arr: T[], dateKey: keyof T): T[] {
+    return [...arr]?.sort(
+      (a, b) =>
+        new Date(b[dateKey] as string)?.getTime() -
+        new Date(a[dateKey] as string)?.getTime()
+    );
+  }
+
+  // Usage
 
   const pastElection = useQuery({
     queryKey: ["election"],
@@ -75,9 +89,10 @@ export default function useElection() {
   const payload = {
     name: values.name,
     description: values.description,
-    status: values.status,
-    electionDate: new Date(),
     userId: user?.id,
+    electionDate:values.electiondate,
+    startDate:values.startdate,
+    endDate:values.enddate,
   };
   const submitHandler = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -86,7 +101,7 @@ export default function useElection() {
   const { mutate } = useMutation({
     mutationFn: () => postApi(`Elections`, payload),
     onSuccess: (data) => {
-      if (data?.name) {
+      if (data?.status !== 400) {
         Toast({ title: "Successful", error: false });
         setSubmitting(false);
         pastElection.refetch();
@@ -100,7 +115,7 @@ export default function useElection() {
       console.error("there was an error", error);
     },
   });
-  const deleteElection = async (id: string) => {
+  const deleteElection = async (id: { id: string }) => {
     setLoading(true);
     const resp = await deleteApi(`Elections/${id?.id}`);
     Toast({ title: "Deleted Successfully", error: false });
@@ -109,10 +124,29 @@ export default function useElection() {
     setEdit(false);
     setEditData(null);
   };
-  console.log('pastElection', pastElection)
-
+  const sortedPreviousElections = sortByDateDescending(
+    pastElection?.data?.previous ?? [],
+    "electionDate"
+  );
+  const sortedOngoingElections = sortByDateDescending(
+    pastElection?.data?.ongoing ?? [],
+    "electionDate"
+  );
+  const sortedUpcomingElections = sortByDateDescending(
+    pastElection?.data?.upcoming ?? [],
+    "electionDate"
+  );
+  // const sortedByElectionDate = sortByDateDescending(elections, 'electionDate');
+  const totalElection =
+    sortedPreviousElections?.length +
+    sortedOngoingElections?.length +
+    sortedUpcomingElections?.length;
   return {
     inputText,
+    totalElection,
+    sortedPreviousElections,
+    sortedOngoingElections,
+    sortedUpcomingElections,
     setCategory,
     setEdit,
     modal,

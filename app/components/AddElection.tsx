@@ -52,7 +52,44 @@ export default function AddElection({
       {errors.description ? (
         <b className="text-xs text-red-500">{errors.description}</b>
       ) : null}
-      <div className="login font-semibold capitalize flex flex-col w-full">
+
+      <Input
+        label="Election Date"
+        placeholder="electiondate"
+        name="electiondate"
+        type="date"
+        onChange={handleChange}
+        onBlur={handleBlur}
+        value={values.electiondate}
+      />
+      {errors.electiondate ? (
+        <b className="text-xs text-red-500">{errors.electiondate}</b>
+      ) : null}
+      <Input
+        label="Start Date"
+        placeholder="startdate"
+        name="startdate"
+        type="date"
+        onChange={handleChange}
+        onBlur={handleBlur}
+        value={values.startdate}
+      />
+      {errors.startdate ? (
+        <b className="text-xs text-red-500">{errors.startdate}</b>
+      ) : null}
+      <Input
+        label=" End Date"
+        placeholder="enddate"
+        name="enddate"
+        type="date"
+        onChange={handleChange}
+        onBlur={handleBlur}
+        value={values.enddate}
+      />
+      {errors.enddate ? (
+        <b className="text-xs text-red-500">{errors.enddate}</b>
+      ) : null}
+      {/* <div className="login font-semibold capitalize flex flex-col w-full">
         <label className="text-sm font-medium">status</label>
         <select
           onChange={handleChange}
@@ -73,7 +110,7 @@ export default function AddElection({
       </div>
       {errors.status ? (
         <b className="text-xs text-red-500">{errors.status}</b>
-      ) : null}
+      ) : null} */}
       <Button
         onClick={handleSubmit}
         label={"Add"}

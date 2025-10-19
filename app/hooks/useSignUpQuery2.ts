@@ -32,7 +32,7 @@ export const useSignUpQuery2 = (country: string, value: string, item: any) => {
       .required()
       .min(8, "Password must be at least 8 characters")
       .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]+$/,
         "Password must contain at least one uppercase, one lowercase, a number and a special character"
       ),
     cpassword: yup
@@ -40,6 +40,7 @@ export const useSignUpQuery2 = (country: string, value: string, item: any) => {
       .required("Confirm Password is required")
       .oneOf([yup.ref("password")], "Passwords must match"),
   });
+  
   const {
     values,
     handleBlur,

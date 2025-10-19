@@ -2,9 +2,13 @@
 import Card from "@/app/components/Card";
 import { PollingDetails } from "@/app/components/PollingDetails";
 import { SearchField } from "@/app/components/Search";
+import useElection from "@/app/hooks/useElection";
 import useReport from "@/app/hooks/useReport";
 import { ArrowView, FilterView } from "@/app/icons/Arrow";
 import Loading from "@/app/loading";
+import { getApi } from "@/app/services";
+import { useState } from "react";
+import ReactPaginate from "react-paginate";
 
 export default function page() {
   const {
@@ -16,7 +20,27 @@ export default function page() {
     setDetails,
     handleDetails,
     detailReport,
+    title,
+    user,
   } = useReport("");
+  const { sortedOngoingElections } = useElection();
+  const [pageNumber, setPageNumber] = useState(0);
+  const pageCount = 5;
+  // const { open } = useStateContext();
+  const pagesVisited = pageNumber * Number(pageCount);
+
+  const displayitems = sortedOngoingElections?.slice(
+    pagesVisited,
+    pagesVisited + Number(pageCount)
+  );
+  const page = Math.ceil(sortedOngoingElections?.length / pageCount);
+  const changePage = ({ selected }: any) => {
+    setPageNumber(selected);
+    window.scrollTo(0, 0);
+  };
+  const getResult = async(id:string) => {
+    const res = await getApi(`elections/${id}`);
+  }
   return (
     <div>
       <h2 className="text-2xl font-bold">Polling Unit Reports</h2>
@@ -42,11 +66,11 @@ export default function page() {
                 <span className="flex items-center justify-center">
                   <Loading />
                 </span>
-              ) : total_report_search?.length > 0 ? (
-                total_report_search?.map((i: any) => (
+              ) : displayitems?.length > 0 ? (
+                displayitems?.map((i: any) => (
                   <aside
                     key={i?.id}
-                    onClick={() => handleDetails(i)}
+                    onClick={() => getResult(i?.id)}
                     className="flex items-center justify-between py-3 px-6 cursor-pointer"
                   >
                     <div className="flex items-center space-x-3">
@@ -58,12 +82,15 @@ export default function page() {
                         />
                       </span> */}
                       <span className="flex flex-col">
-                        <h2 className="font-medium">{i?.ward}{', '}{i?.LGA} Polling Unit</h2>
+                        <h2 className="font-medium">
+                        
+                          {i?.description}
+                        </h2>
                         <small className="text-[#272727]">
-                          {new Date(i?.createdAt)?.toDateString()}
+                          {new Date(i?.electionDate)?.toDateString()}
                         </small>
                       </span>
-                      {i?.type !== 'report' ? (
+                      {i?.type !== "report" ? (
                         <p className="p-2 bg-[#E4FFE4] w-max rounded text-sm font-medium">
                           Result
                         </p>
@@ -83,14 +110,40 @@ export default function page() {
                   no result
                 </p>
               )}
+              <ReactPaginate
+                previousLabel={
+                  <p className="rounded-lg bg-gray-100 p-3 font-semibold capitalize">
+                    prev
+                  </p>
+                }
+                nextLabel={
+                  <p className="rounded-lg bg-gray-100 p-3 font-semibold capitalize">
+                    next
+                  </p>
+                }
+                pageCount={page}
+                onPageChange={(e) => changePage(e)}
+                containerClassName={
+                  "p-2 text-xs lg:text-base flex space-x-3 items-center"
+                }
+                previousLinkClassName={"rounded-sm p-2"}
+                nextLinkClassName={"rounded-sm p-2"}
+                disabledClassName={""}
+                pageClassName={"text-[#1F2024]"}
+                activeClassName={
+                  "rounded shadow-xl bg-gray-700 !text-white px-2 font-semibold"
+                }
+              />
             </div>
           </Card>
         </section>
         {details && (
           <div className="w-full lg:w-1/3">
             <PollingDetails
+              user={user}
               handleDetails={() => setDetails(false)}
               data={detailReport}
+              title={title}
               type={detailReport?.accreditedVoters >= 0 ? "result" : "report"}
             />
           </div>

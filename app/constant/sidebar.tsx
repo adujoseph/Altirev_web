@@ -97,6 +97,12 @@ export const list3 = [
     icon: <Role color="#CBCBCB" />,
     icon2: <Role color="#2550C0" />,
   },
+  {
+    title: "Election",
+    path: "/dashboard/election",
+    icon: <Result color="#CBCBCB" />,
+    icon2: <Result color="#2550C0" />,
+  },
 ];
 // comms menu
 

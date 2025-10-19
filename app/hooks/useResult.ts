@@ -11,7 +11,7 @@ import useStateLGA from "./useStateLGA";
 export default function useResult(id: string) {
   const [inputText, setInputText] = useState("");
   const deferedValue = useDeferredValue(inputText);
-  const { edit, setEdit, editData, setEditData,title } = useStateContext();
+  const { edit, setEdit, editData, setEditData, title } = useStateContext();
   const [loading, setLoading] = useState(false);
   const [tags, setTags] = useState("");
   const [modal, setModal] = useState(false);
@@ -246,8 +246,7 @@ export default function useResult(id: string) {
     refetchInterval: 120000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-    onSuccess(data: any) {
-    },
+    onSuccess(data: any) {},
     onError: (error: any) => console.error(error),
   });
   const pollingFilter = useQuery({
@@ -261,8 +260,7 @@ export default function useResult(id: string) {
     refetchInterval: 12000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-    onSuccess(data: any) {
-    },
+    onSuccess(data: any) {},
     onError: (error: any) => console.error(error),
   });
   const resultByID = useQuery({
@@ -276,8 +274,7 @@ export default function useResult(id: string) {
     refetchInterval: 12000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-    onSuccess: (data) => {
-    },
+    onSuccess: (data) => {},
 
     onError: (error: any) => console.error(error),
   });
@@ -288,6 +285,10 @@ export default function useResult(id: string) {
       ? pendingResult
       : approvedResult;
 
+  useEffect(() => {
+    if (!title) return;
+    if (title === "Observer") setCategory("approved");
+  }, [title]);
   const resultSearch = useMemo(
     () =>
       deferedValue
@@ -328,8 +329,7 @@ export default function useResult(id: string) {
     refetchInterval: 12000, // 2 minutes
     refetchIntervalInBackground: true,
     placeholderData: keepPreviousData,
-    onSuccess: (data) => {
-    },
+    onSuccess: (data) => {},
 
     onError: (error: any) => console.error(error),
   });
@@ -376,6 +376,7 @@ export default function useResult(id: string) {
     editData,
     results,
     resultID,
-    setEditData,title
+    setEditData,
+    title,approvedResult,pendingResult
   };
 }

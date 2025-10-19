@@ -25,9 +25,10 @@ function DashboardWrapper({ children }: any) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  useMemo(() => {
-    windowSize.width <= 1000 ? setOpenMenu(false) : setOpenMenu(true);
-  }, [windowSize]);
+  useEffect(() => {
+    setOpenMenu(windowSize.width > 1000);
+  }, [windowSize, setOpenMenu]);
+  
 
   function isTokenExpired(token: string) {
     try {

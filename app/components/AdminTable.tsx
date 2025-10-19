@@ -152,7 +152,7 @@ export const AdminSubTable = ({
                 <FilterView />
               </p>
             </span> */}
-        <div className="flex flex-col  ">
+        {/* <div className="flex flex-col  ">
           <label className="font-semibold " htmlFor="div">
             Choose election type
           </label>
@@ -170,7 +170,7 @@ export const AdminSubTable = ({
             <option value="ongoing">Ongoing</option>
             <option value="previous">Previous</option>
           </select>
-        </div>
+        </div> */}
       </div>
     </aside>
     <div className="w-full overflow-auto my-3 scrollbar-thin scrollbar-track-gray-400/20 scrollbar-thumb-[#98989A] p-10">

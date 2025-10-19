@@ -13,12 +13,13 @@ import { ReportType, User } from "../typings";
 import Loading from "../loading";
 import { useAppSelector } from "../redux/hook";
 import { extractTime } from "./table";
+import { useStateContext } from "../context/context";
 
 interface Props {
   setEdit: (e: boolean) => boolean;
   userDetails: any;
   details: ReportType;
-  sendReport: () => void;
+  sendReport: (e: string) => void;
   loading: boolean;
   setComment: (e?: any) => void;
   setSuccess: (e?: any) => void;
@@ -37,7 +38,6 @@ export default function ReportDetails({
   userDetails,
   success,
   setSuccess,
-  commsUser,
 }: Props) {
   const [modal3, setModal3] = useState(false);
   const [modal, setModal] = useState(false);
@@ -48,15 +48,26 @@ export default function ReportDetails({
   const handleModal3 = () => setModal3((prev) => !prev);
   const navigate = useRouter();
   const user: User = useAppSelector((state) => state?.user?.user);
+  const { setIsEscalated, isEscalated } = useStateContext();
+
   const back = () => {
+    if (isEscalated) {
+      navigate.push("/dashboard/report/escalated");
+      setEdit(false);
+      setIsEscalated(false);
+      return;
+    }
     navigate.push("/dashboard/report");
     setEdit(false);
+    setIsEscalated(false);
   };
   const handleEscalateModal = () => setEscalate((prev) => !prev);
+
   useEffect(() => {
     // Prefetch the dashboard page
     navigate.prefetch("/dashboard/report");
   }, [navigate]);
+
   const audioRef: any = useRef(null);
 
   const handleTimeUpdate = () => {
@@ -75,13 +86,14 @@ export default function ReportDetails({
     ); // fragment locator
     return !!urlPattern.test(string);
   }
+
   const result = details?.createdAt && extractTime(details?.createdAt);
   const changeReportstatus = () => {
     if (details?.status === "pending") sendReport("processing");
     setSuccess(false);
     return;
   };
-
+  const { title } = useStateContext();
   useEffect(() => {
     user?.role === "comms" ? changeReportstatus() : () => {};
   }, [details?.status, user?.role]);
@@ -161,31 +173,37 @@ export default function ReportDetails({
             <div className="w-full sm:w-1/2">
               <Card>
                 <div className="p-4">
-                  <span className="my-2">
+                  <aside className="my-2">
                     <h2 className="font-semibold mt-4">Video File of Report</h2>
 
-                    {isValidURL(details?.videoUrl) ? (
+                    {isValidURL(details?.videoUrl as string) ? (
                       <>
                         <p className="text-sm">
                           This video shows the evidence of the incident.
                         </p>
                         <hr className="bg-black my-2 h-0.5" />
 
-                        <div>
+                        <div className="!h-[400px] !flex-1 flex overflow-hidden w-full rounded-lg">
                           {/* videos */}
-                          <Player>
-                            <source src={details.videoUrl ?? ""} />
-                          </Player>
+
+                          <Player
+                            playsInline
+                            src={details?.videoUrl ?? ""}
+                            fluid={false}
+                            width={350}
+                            height={400}
+                            
+                          />
                         </div>
                       </>
                     ) : (
                       <p className="text-sm capitalize">No video report</p>
                     )}
-                  </span>
-                  <span className="my-2">
+                  </aside>
+                  <span className="!my-10">
                     <h2 className="font-semibold">Audio Recording</h2>
 
-                    {isValidURL(details?.audioUrl) ? (
+                    {isValidURL(details?.audioUrl as string) ? (
                       <>
                         <p className="text-sm">
                           Audio recording during the election.
@@ -220,7 +238,7 @@ export default function ReportDetails({
                             controls
                             ref={audioRef}
                             className=""
-                            src={details.audioUrl} // Replace with your audio file path
+                            src={details.audioUrl as string} // Replace with your audio file path
                             onTimeUpdate={handleTimeUpdate}
                           />
                         </div>
@@ -252,30 +270,32 @@ export default function ReportDetails({
                   </span>
                 </div>
               </Card>
-              {details?.status === "processing" && user?.role === "comms" && (
-                <Card>
-                  <div className="flex items-center justify-center flex-col p-5 space-y-2">
-                    <button
-                      onClick={handleModal3}
-                      className="w-full bg-[#FF0E00] text-white rounded font-semibold capitalize p-2 "
-                    >
-                      Reject
-                    </button>
-                    <button
-                      onClick={handleModal2}
-                      className="w-full bg-[#2550C0] text-white rounded font-semibold capitalize p-2 "
-                    >
-                      Approve
-                    </button>
-                  </div>
-                </Card>
-              )}
+              {details?.status === "processing" &&
+                user?.role === "comms" &&
+                title !== "Observer" && (
+                  <Card>
+                    <div className="flex items-center justify-center flex-col p-5 space-y-2">
+                      <button
+                        onClick={handleModal3}
+                        className="w-full bg-[#FF0E00] text-white rounded font-semibold capitalize p-2 "
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={handleModal2}
+                        className="w-full bg-[#2550C0] text-white rounded font-semibold capitalize p-2 "
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  </Card>
+                )}
               {details?.status === "rejected" && (
                 <Card>
                   <div className="p-5">
                     <h2 className="font-semibold"> Reason for Rejection</h2>
                     <hr className="bg-black my-2 h-0.5" />
-                    <p>{details?.reasons}</p>
+                    <p>{details?.reasons as string}</p>
                   </div>
                 </Card>
               )}
