@@ -86,6 +86,7 @@ export interface ReportType {
   imageUrl: string | null;
   createdAt: string;
   updatedAt: string;
+  counts:any
 }
 export interface ResultType {
   id: string;

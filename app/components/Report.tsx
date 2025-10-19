@@ -11,6 +11,7 @@ import useReport from "../hooks/useReport";
 import { User } from "../typings";
 import SendReport from "./SendReport";
 import useAuth from "./Auth";
+import { useEffect } from "react";
 
 function Report() {
   const {  } = useAuth(["comms",'moderator']);
@@ -45,8 +46,11 @@ function Report() {
     sendReport,
     setReportStatus,
     reportStatus,
-    setComment,
+    setComment,setIsEscalated
   } = useReport("");
+  useEffect(() => {
+    setIsEscalated(false)
+  },[])
   return (
     <>
       {edit && table === "change status" && (

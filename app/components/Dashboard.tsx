@@ -26,9 +26,16 @@ export default function Dashboard() {
   const [addUserModal, setAddUserModal] = useState(false);
   const handleModal = () => setAddUserModal((prev) => !prev);
   const handleNotificationModal = () => setNotificationModal((prev) => !prev);
-  const [category, setCategory] = useState("past");
-  const { showOverview, title, setTitle, setOpenMenu, setShowOverview } =
-    useStateContext();
+  const [category, setCategory] = useState("overview");
+  const {
+    showOverview,
+    title,
+    setTitle,
+    setOpenMenu,
+    setShowOverview,
+    setIsEscalated,
+    electionData,
+  } = useStateContext();
   const { result } = useResult("");
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -40,13 +47,13 @@ export default function Dashboard() {
         );
       });
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-        setShowOverview(false)
-      }
+      back();
     }
   }, []);
 
+  useEffect(() => {
+    setIsEscalated(false);
+  }, []);
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -56,10 +63,37 @@ export default function Dashboard() {
     return () =>
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
+  const back = () => {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+      setShowOverview(false);
+    }
+  };
+  useEffect(() => {
+    if (!title) return;
+    if (title === "moderator") setCategory("overview");
+  }, [title]);
+
   const enableFullScreen = () => {
-    setView(3);
-    setOpenMenu(false);
-    toggleFullscreen();
+    if (typeof window !== "undefined") {
+      setView(3);
+      setOpenMenu(false);
+      // toggleFullscreen();
+      const data = {
+        id: electionData?.id,
+        name: electionData?.name,
+        date: electionData?.date,
+      };
+      const appBaseUrl = window.location.origin; // e.g. "http://localhost:3000" or "https://myapp.com"
+      const url = new URL(
+        `${appBaseUrl}/dashboard/elections/`,
+        window.location.origin
+      );
+      url.searchParams.set("id", data?.id);
+      url.searchParams.set("name", data?.name);
+      url.searchParams.set("date", data?.date);
+      window.open(url?.toString(), "_blank");
+    }
   };
   const {
     states,
@@ -79,9 +113,8 @@ export default function Dashboard() {
   const changeProfile = (item: string) => {
     setTitle(item);
   };
-  
   return (
-  <>
+    <>
       {addUserModal && (
         <ModalCard open={addUserModal} setOpen={handleModal}>
           <FilterVotes
@@ -109,7 +142,7 @@ export default function Dashboard() {
       )}
       {view === 3 && (
         <Analysis
-          toggleFullscreen={toggleFullscreen}
+          toggleFullscreen={back}
           setOpenMenu={setOpenMenu}
           setView={setView}
         />

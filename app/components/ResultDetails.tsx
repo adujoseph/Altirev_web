@@ -25,14 +25,16 @@ import { addThousandSeparator } from "../utils";
 import { patchApi } from "../services";
 import { Toast } from "./Toast";
 import { extractTime } from "./table";
+import { useStateContext } from "../context/context";
+import { PreviewImg } from "./PreviewImg";
 
 interface Props {
   setEdit: (e: boolean) => boolean;
   userDetails: any;
   editData: any;
   loading: boolean;
-  details: ResultType;
-  setEditData: () => void;
+  details: ResultType | any;
+  setEditData: (e: null) => void;
   setTags: () => void;
   addTags: () => void;
   tagsList: any;
@@ -53,14 +55,18 @@ export default function Details({
   const user: User = useAppSelector((state) => state?.user?.user);
   const [counts, setCounts] = useState([]);
   const [loading2, setLoading2] = useState(false);
+  const [modalImg, setModalImg] = useState(false);
   const [modal4, setModal4] = useState(false);
   const [modal3, setModal3] = useState(false);
   const [modal, setModal] = useState(false);
   const [modal2, setModal2] = useState(false);
   const handleModal2 = () => setModal2((prev) => !prev);
   const handleModal = () => setModal((prev) => !prev);
+  const handleModalImg = () => setModalImg((prev) => !prev);
   const handleModal3 = () => setModal3((prev) => !prev);
   const navigate = useRouter();
+  const { title } = useStateContext();
+
   const handleModal4 = () => setModal4((prev) => !prev);
   const result = details?.createdAt && extractTime(details?.createdAt);
   const back = () => {
@@ -68,7 +74,7 @@ export default function Details({
     setEdit(false);
     setEditData(null);
   };
-  const approveRejectElection = async (status: boolean) => {
+  const approveRejectElection = async (status: boolean, func: any) => {
     setLoading2(true);
     const resp = await patchApi(`polls/status/${details?.id}`, {
       confirm: status,
@@ -81,6 +87,7 @@ export default function Details({
       Toast({ title: resp?.response?.message, error: false });
       setLoading2(false);
     }
+    func();
   };
   const countArr = () => {
     const array = Object.entries(details?.counts).map(([party, votes]) => ({
@@ -124,38 +131,41 @@ export default function Details({
     imageUrl: string,
     watermarkText: string
   ) {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/proxy-image?url=` + encodeURIComponent(imageUrl);
+    const proxiedUrl = `/api/image?url=${encodeURIComponent(imageUrl)}`;
+
     const img = new Image();
-    img.crossOrigin = "anonymous"; // Important if the image is from another domain
-    img.src = imageUrl;
+    img.crossOrigin = "anonymous";
+    img.src = proxiedUrl;
 
     img.onload = () => {
-      // Create canvas
       const canvas = document.createElement("canvas");
       canvas.width = img.width;
       canvas.height = img.height;
 
-      const ctx: any = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-      // Draw image on canvas
+      // Draw image
       ctx.drawImage(img, 0, 0);
 
-      // Add watermark
+      // Watermark settings
       ctx.font = "48px Arial";
       ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
       ctx.rotate(-Math.PI / 6);
       ctx.fillText(watermarkText, img.width / 4, img.height / 2);
 
-      // Convert canvas to Blob and download
-      canvas.toBlob((blob: any) => {
-        const url = URL.createObjectURL(blob);
+      // Download as blob
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+
+        const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        a.href = url;
-        a.download = `${details?.location?.pollingUnit?.pollingUnit}.png`;
+        a.href = blobUrl;
+        a.download = `image.png`; // <-- optionally make dynamic
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(blobUrl);
       }, "image/png");
     };
 
@@ -171,6 +181,13 @@ export default function Details({
           data={userDetails}
           modal={modal}
           handleModal={handleModal}
+        />
+      )}
+      {modalImg && (
+        <PreviewImg
+          img={details?.fileUrl}
+          modal={modalImg}
+          handleModal={handleModalImg}
         />
       )}
       {modal4 && (
@@ -189,7 +206,7 @@ export default function Details({
           loading={loading2}
           modal={modal2}
           handleModal={handleModal2}
-          handleSubmit={() => approveRejectElection(true)}
+          handleSubmit={() => approveRejectElection(true, handleModal2)}
         />
       )}
 
@@ -199,7 +216,7 @@ export default function Details({
           loading={loading2}
           modal={modal3}
           handleModal={handleModal3}
-          handleSubmit={() => approveRejectElection(false)}
+          handleSubmit={() => approveRejectElection(false, handleModal3)}
           setComment={() => {}}
         />
       )}
@@ -296,22 +313,16 @@ export default function Details({
                         This is the CTC copy taken by the agent
                       </p>
                       <hr className="my-4" />
-                      <div
-                      
-                        className="bg-[#CBCBCB] flex items-center justify-center p-2 flex-col relative"
-                      >
+                      <div className="bg-[#CBCBCB] flex items-center justify-center p-2 flex-col relative">
                         <img
                           className="size-[100px] "
                           src={details?.fileUrl ?? ""}
                           alt="doc"
                         />
-                        <p 
-                          onClick={() =>
-                            watermarkImageFromURL(
-                              details?.fileUrl as string,
-                              "Alitrev"
-                            )
-                          } className="ml-auto  absolute bottom-3 cursor-pointer right-10">
+                        <p
+                          onClick={handleModalImg}
+                          className="ml-auto  absolute bottom-3 cursor-pointer right-10"
+                        >
                           <DownloadVotes />
                         </p>
                       </div>
@@ -329,11 +340,16 @@ export default function Details({
                         </p>
                         <hr className="bg-black my-2 h-0.5" />
 
-                        <div>
+                        <div className="!h-[400px] !flex-1 flex overflow-hidden w-full rounded-lg">
                           {/* videos */}
-                          <Player>
-                            <source src={details?.videoUrl ?? ""} />
-                          </Player>
+
+                          <Player
+                            playsInline
+                            src={details?.videoUrl ?? ""}
+                            fluid={false}
+                            width={350}
+                            height={400}
+                          />
                         </div>
                       </>
                     ) : (
@@ -387,24 +403,26 @@ export default function Details({
                     : null}
                 </div>
               </Card>
-              {details?.status === "processing" && user?.role === "comms" && (
-                <Card>
-                  <div className="flex items-center justify-center flex-col p-5 space-y-2">
-                    <button
-                      onClick={handleModal3}
-                      className="w-full bg-[#FF0E00] text-white rounded font-semibold capitalize p-2 "
-                    >
-                      reject
-                    </button>
-                    <button
-                      onClick={handleModal2}
-                      className="w-full bg-[#2550C0] text-white rounded font-semibold capitalize p-2 "
-                    >
-                      approve
-                    </button>
-                  </div>
-                </Card>
-              )}
+              {details?.status === "processing" &&
+                user?.role === "comms" &&
+                title !== "Observer" && (
+                  <Card>
+                    <div className="flex items-center justify-center flex-col p-5 space-y-2">
+                      <button
+                        onClick={handleModal3}
+                        className="w-full bg-[#FF0E00] text-white rounded font-semibold capitalize p-2 "
+                      >
+                        reject
+                      </button>
+                      <button
+                        onClick={handleModal2}
+                        className="w-full bg-[#2550C0] text-white rounded font-semibold capitalize p-2 "
+                      >
+                        approve
+                      </button>
+                    </div>
+                  </Card>
+                )}
               {details?.status === "rejected" && (
                 <Card>
                   <div className="p-5">

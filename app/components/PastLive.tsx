@@ -10,13 +10,15 @@ import { addThousandSeparator } from "../utils";
 import { VoteBreakDown } from "./VoteBreakDown";
 import { useStateContext } from "../context/context";
 import { partyColors } from "../constant/party";
+import ReactPaginate from "react-paginate";
 
 export default function PastLive({ handleModal, data, loading }: any) {
   const [details, setDetails] = useState<null | any>();
   const [electiondetails, setElectionDetails] = useState<null | any>();
   const [view, setView] = useState(1);
-  const { setElectionData, setShowOverview } = useStateContext();
+  const { setElectionData, setShowOverview} = useStateContext();
   const [show, setShow] = useState(false);
+
   const handleShow = (item: any) => {
     setDetails(item);
     setView(2);
@@ -29,13 +31,19 @@ export default function PastLive({ handleModal, data, loading }: any) {
   const handleElectionResult = async () => {
     setShow(true);
     const resp = await getApi(`polls/vote_count/${details?.id}`);
-    const mergedData = resp?.resultArray?.map((vote: any) => {
+    const newField = {
+      partyName: "Invalid Votes",
+      partyVote: resp?.totalInvalidVotes,
+    };
+    const res = [...resp?.resultArray, newField];
+    const mergedData = res?.map((vote: any) => {
       const partyColor = partyColors.find(
         (color) => color.party === vote.partyName
       );
+
       return {
         ...vote,
-        partyColor: partyColor ? partyColor.color : null,
+        partyColor: partyColor ? partyColor.color : "#dfdfdf",
       };
     });
     setElectionDetails({
@@ -49,7 +57,11 @@ export default function PastLive({ handleModal, data, loading }: any) {
     setElectionData({
       date: details?.createdAt,
       name: details?.name,
-    ...resp,
+      resultArray: mergedData,
+      totalAccreditedVoters: resp?.totalAccreditedVoters,
+      totalInvalidVotes: resp?.totalInvalidVotes,
+      totalVotesCasted: resp?.totalVotesCasted,
+      id:details?.id
     });
     setShow(false);
   };
@@ -57,6 +69,21 @@ export default function PastLive({ handleModal, data, loading }: any) {
   useEffect(() => {
     details?.id && handleElectionResult();
   }, [details?.id]);
+
+  const [pageNumber, setPageNumber] = useState(0);
+  const pageCount = 5;
+  // const { open } = useStateContext();
+  const pagesVisited = pageNumber * Number(pageCount);
+  const displayitems = data?.slice(
+    pagesVisited,
+    pagesVisited + Number(pageCount)
+  );
+  const page = Math.ceil(data?.length / pageCount);
+  const changePage = ({ selected }: any) => {
+    setPageNumber(selected);
+    window.scrollTo(0, 0);
+  };
+  const totalVote = electiondetails?.totalVotesCasted+electiondetails?.totalInvalidVotes
   return (
     <>
       {view === 2 && (
@@ -113,7 +140,7 @@ export default function PastLive({ handleModal, data, loading }: any) {
                     </p>
                     <h2 className="font-semibold text-xl mt-4">Vote Casted:</h2>
                     <p className="font-semibold text-[#656565]">
-                      {addThousandSeparator(electiondetails?.totalVotesCasted)}
+                      {addThousandSeparator(totalVote)}
                     </p>
 
                     <div className="my-4 flex flex-col">
@@ -122,32 +149,22 @@ export default function PastLive({ handleModal, data, loading }: any) {
                         <progress
                           className="progressBar"
                           value={
-                            ((electiondetails?.totalVotesCasted -
-                              electiondetails?.totalInvalidVotes) /
-                              electiondetails?.totalVotesCasted) *
+                            (electiondetails?.totalVotesCasted) / totalVote *
                             100
                           }
                           max={100}
                         >
-                          {(
-                            ((electiondetails?.totalVotesCasted -
-                              electiondetails?.totalInvalidVotes) /
-                              electiondetails?.totalVotesCasted) *
-                            100
-                          )?.toFixed(2)}
+                          {electiondetails?.totalVotesCasted/totalVote}
                           %
                         </progress>
                       </span>
                       <p className="text-[#656565]">
                         {addThousandSeparator(
-                          electiondetails?.totalVotesCasted -
-                            electiondetails?.totalInvalidVotes
+                          electiondetails?.totalVotesCasted
                         )}{" "}
                         ({" "}
                         {(
-                          ((electiondetails?.totalVotesCasted -
-                            electiondetails?.totalInvalidVotes) /
-                            electiondetails?.totalVotesCasted) *
+                          (electiondetails?.totalVotesCasted /totalVote) *
                           100
                         )?.toFixed(2)}
                         %)
@@ -159,15 +176,13 @@ export default function PastLive({ handleModal, data, loading }: any) {
                         <progress
                           className="progressBar"
                           value={
-                            (electiondetails?.totalInvalidVotes /
-                              electiondetails.totalVotesCasted) *
+                            electiondetails?.totalInvalidVotes/totalVote *
                             100
                           }
                           max={100}
                         >
-                          {(
-                            (electiondetails?.totalInvalidVotes /
-                              electiondetails?.totalVotesCasted) *
+                          {
+                            (electiondetails?.totalInvalidVotes /totalVote *
                             100
                           )?.toFixed(2)}
                           %
@@ -181,7 +196,7 @@ export default function PastLive({ handleModal, data, loading }: any) {
                         ({" "}
                         {(
                           (electiondetails?.totalInvalidVotes /
-                            electiondetails?.totalVotesCasted) *
+                            totalVote) *
                           100
                         )?.toFixed(2)}
                         %)
@@ -238,12 +253,11 @@ export default function PastLive({ handleModal, data, loading }: any) {
       {view === 3 && (
         <VoteBreakDown
           data={{
-            totalVotes: electiondetails?.totalVotesCasted,
+            totalVotes: electiondetails?.totalVotesCasted + electiondetails?.totalInvalidVotes,
             results: electiondetails?.resultArray,
           }}
           setView={setView as never}
           handleModal={handleModal}
-
         />
       )}
 
@@ -256,17 +270,44 @@ export default function PastLive({ handleModal, data, loading }: any) {
                 viewBox="0 0 24 24"
               ></svg>
             </p>
-          ) : data?.length > 0 ? (
-            data?.map((item: any) => (
-              <ElectionCard
-                item={item}
-                color="#fff"
-                handleShow={handleShow}
-                key={item?.id}
+          ) : displayitems?.length > 0 ? (
+            <>
+              {displayitems?.map((item: any) => (
+                <ElectionCard
+                  item={item}
+                  color="#fff"
+                  handleShow={handleShow}
+                  key={item?.id}
+                />
+              ))}
+
+              <ReactPaginate
+                previousLabel={
+                  <p className="rounded-lg bg-gray-100 p-3 font-semibold capitalize">
+                    prev
+                  </p>
+                }
+                nextLabel={
+                  <p className="rounded-lg bg-gray-100 p-3 font-semibold capitalize">
+                    next
+                  </p>
+                }
+                pageCount={page}
+                onPageChange={(e) => changePage(e)}
+                containerClassName={
+                  "p-2 text-xs lg:text-base flex space-x-3 items-center"
+                }
+                previousLinkClassName={"rounded-sm p-2"}
+                nextLinkClassName={"rounded-sm p-2"}
+                disabledClassName={""}
+                pageClassName={"text-[#1F2024]"}
+                activeClassName={
+                  "rounded shadow-xl bg-gray-700 !text-white px-2 font-semibold"
+                }
               />
-            ))
+            </>
           ) : (
-            <p className="font-semibold mt-4 text-gray-500 ">No Result</p>
+            <p className="font-semibold mt-4 text-gray-500 ">There are no scheduled elections at this time</p>
           )}
         </div>
       )}

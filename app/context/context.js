@@ -17,6 +17,7 @@ export const ContextProvider = ({ children }) => {
   const user = useAppSelector((state) => state?.user?.user);
   const [open, setOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
+  const [isEscalated, setIsEscalated] = useState(false);
   const [edit, setEdit] = useState(false);
   const [electionData, setElectionData] = useState(null);
   const [showOverview, setShowOverview] = useState(false);
@@ -36,7 +37,6 @@ export const ContextProvider = ({ children }) => {
   const handleClick = () => {
     setOpen((prev) => !prev);
   };
-
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
     <StateContext.Provider
@@ -68,7 +68,7 @@ export const ContextProvider = ({ children }) => {
         electionData,
         setElectionData,
         showOverview,
-        setShowOverview,
+        setShowOverview,setIsEscalated,isEscalated
       }}
     >
       {children}

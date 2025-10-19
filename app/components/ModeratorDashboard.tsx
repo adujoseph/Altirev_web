@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowView, Danger, FilterView } from "../icons/Arrow";
 import Link from "next/link";
 import PieChart from "./Chart";
@@ -16,10 +16,14 @@ interface Props {
   setView: (e?: string) => void;
 }
 
-export default function ModeratorDashboard({ setCategory, category, setView }: Props) {
+export default function ModeratorDashboard({
+  setCategory,
+  category,
+  setView,
+}: Props) {
   const [modal, setModal] = useState(false);
   const handleModal = () => setModal((prev) => !prev);
-  const { results } = useResult("");
+  const { results, pendingResult } = useResult("");
   const {
     states,
     stateLga,
@@ -34,11 +38,20 @@ export default function ModeratorDashboard({ setCategory, category, setView }: P
     pollingUnitId,
     ward,
     report,
+    escalatedReport,
   } = useReport("");
-  const { pastElection } = useElection();
+  
+  const {
+    pastElection,
+    sortedOngoingElections,
+    sortedPreviousElections,
+    sortedUpcomingElections,
+  } = useElection();
+
+  // const totalVote = electiondetails?.totalVotesCasted+electiondetails?.totalInvalidVotes
+
   return (
     <>
-    
       {modal && (
         <ModalCard open={modal} setOpen={handleModal}>
           <FilterVotes
@@ -99,7 +112,7 @@ export default function ModeratorDashboard({ setCategory, category, setView }: P
           </span>
         </div> */}
         <PastLive
-          data={pastElection?.data?.previous}
+          data={sortedPreviousElections}
           loading={pastElection?.isLoading}
           setView={setView}
           handleModal={handleModal}
@@ -118,7 +131,7 @@ export default function ModeratorDashboard({ setCategory, category, setView }: P
               </p>
               <span className="flex items-center space-x-2">
                 <p className="text-4xl font-bold">
-                  {report?.data?.length ?? 0}
+                  {escalatedReport?.data?.length ?? 0}
                 </p>
               </span>
             </div>
@@ -132,7 +145,7 @@ export default function ModeratorDashboard({ setCategory, category, setView }: P
             </span>
 
             <h1 className="ml-auto bottom-5 right-5 text-4xl font-bold absolute">
-              {results?.data?.length ?? 0}
+              {pendingResult?.data?.length ?? 0}
             </h1>
           </div>
         </aside>

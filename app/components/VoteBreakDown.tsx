@@ -13,6 +13,14 @@ interface Props {
 }
 
 export const VoteBreakDown = memo(({ data, setView,handleModal }: Props) => {
+
+  const totalVotes = data?.results?.reduce((sum:any, item:any) => sum + item.partyVote, 0);
+
+const withPercentages = data?.results?.map((item:any) => ({
+  ...item,
+  percentage: ((item.partyVote / totalVotes) * 100)?.toFixed(0), // rounded to 2 decimal places
+}));
+
   return (
     <div>
       <span
@@ -44,13 +52,13 @@ export const VoteBreakDown = memo(({ data, setView,handleModal }: Props) => {
         <div className="w-full lg:w-1/4">
           <Card>
             <div className=" flex flex-col space-y-3 h-screen overflow-y-scroll">
-              {data?.results?.map((i: any) => (
+              {withPercentages?.map((i: any) => (
                 <div className="flex items-center justify-between my-1 px-3 py-1">
                   <span className="flex items-center space-x-1">
                     <p className="text-xs">{i?.partyName}</p>
                   </span>
                   <p className="text-sm font-semibold">
-                    {((i?.partyVote / data?.totalVotes) * 100)?.toFixed(0)}%
+                    {i?.percentage}%
                   </p>
                 </div>
               ))}

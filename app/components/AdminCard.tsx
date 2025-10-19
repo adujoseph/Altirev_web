@@ -3,9 +3,11 @@ import React from "react";
 import { DashboardAgent, DashboardHat } from "../icons/Dashboard";
 import useRole from "../hooks/useRole";
 import { User } from "../typings";
+import useElection from "../hooks/useElection";
 
 export default function AdminCard({ setCategory, category }: any) {
   const { allUser } = useRole();
+  const {totalElection} = useElection()
   const active = allUser.data?.filter((res: User) => res?.status === "active");
   return (
     <aside className="flex flex-col justify-center items-center sm:items-start sm:justify-start sm:grid sm:grid-cols-3 sm:gap-1 lg:gap-4">
@@ -29,8 +31,19 @@ export default function AdminCard({ setCategory, category }: any) {
             Election
           </h1>
         </span>
+        <div className="flex items-center justify-between font-bold">
+          <span
+            style={{
+              color: category === "election" ? "white" : "#698AE2",
+            }}
+            className="flex flex-col text-white"
+          >
+            <p>Total</p>
+            <h1 className="text-xl">{totalElection ?? 0}</h1>
+          </span>
+        </div>
       </div>
-      <div
+      {/* <div
         onClick={() => setCategory("users")}
         style={{
           background: category === "users" ? "#7478BE" : "white",
@@ -90,7 +103,7 @@ export default function AdminCard({ setCategory, category }: any) {
             </h1>
           </span>
         </div>
-      </div>
+      </div> */}
     </aside>
   );
 }
